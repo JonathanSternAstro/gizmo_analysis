@@ -2,8 +2,13 @@ import h5py, numpy as np, glob, string, os, pdb, time
 homedir = os.getenv("HOME")+'/'
 if 'jonathan/' in homedir:
     basedir = homedir+'Dropbox/jonathanmain/CGM/rapidCoolingCGM/'
+    tables_dir=basedir+'../data/CoolingTables/'
+elif 'jovyan' in homedir:
+    basedir = homedir+'fire_analysis/'
+    tables_dir=basedir+'CoolingTables/'
 else:
     basedir = homedir+'jonathanmain/CGM/rapidCoolingCGM/'
+    tables_dir=basedir+'../data/CoolingTables/'
 if 'tg839127' in homedir:
     pyobjDir = '/work/04613/tg839127/simulation_data/FIRE/no_yt/'
 elif 'ysz5546' in homedir:
@@ -60,7 +65,7 @@ def z_from_iSnapshot(iSnapshot,stampede=True):
     zs =np.load(fn)['zs']    
     return zs[ind]
 
-def LambdaFunc(z,tables_dir=basedir+'../data/CoolingTables/'):
+def LambdaFunc(z):
     fns = np.array(glob.glob(tables_dir+'z_?.???.hdf5'))
     zs = np.array([float(fn[-10:-5]) for fn in fns])
     fn = fns[zs.argsort()][u.searchsortedclosest(sorted(zs), z)]

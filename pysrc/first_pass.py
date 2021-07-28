@@ -1,12 +1,32 @@
 import sys, os, subprocess, multiprocessing, traceback
 homedir = os.getenv("HOME")+'/'
 
-projectdir = homedir+'jonathanmain/CGM/KY_sims/'
+if 'jonathan/' in homedir:
+    basedir = homedir+'Dropbox/jonathanmain/CGM/rapidCoolingCGM/'
+    tables_dir=basedir+'../data/CoolingTables/'
+elif 'jovyan' in homedir:
+    basedir = homedir+'fire_analysis/'
+    tables_dir=basedir+'CoolingTables/'
+else:
+    basedir = homedir+'jonathanmain/CGM/rapidCoolingCGM/'
+    tables_dir=basedir+'../data/CoolingTables/'
+if 'tg839127' in homedir:
+    pyobjDir = '/work/04613/tg839127/simulation_data/FIRE/no_yt/'
+elif 'ysz5546' in homedir:
+    pyobjDir = '/projects/b1026/jonathan/analysis_pyobjs/no_yt/'
+else:
+    pyobjDir = basedir+'pyobj/no_yt_analysis/'
+
+if 'ysz5546' in homedir:
+    projectdir = homedir+'jonathanmain/CGM/KY_sims/'
+    project_workdir = '/projects/b1026/jonathan/KY_sims/'
+    simdir = project_workdir+'sim_outputs/'
+if 'jovyan' in homedir:
+    projectdir = basedir
+    simdir = project_workdir = homedir+'/data/'
 profiledir = projectdir + 'radialProfiles/'
 figdir = projectdir+'figures/'
 moviedir = projectdir+'figures/movieFrames/'
-project_workdir = '/projects/b1026/jonathan/KY_sims/'
-simdir = project_workdir+'sim_outputs/'
 projectionsdir = project_workdir+'projections/'
 
 import FIRE_files as ff
@@ -423,7 +443,7 @@ class KY_sim:
                 pl.plot(times,Tvirs,ls=':',c='k')
                 pl.ylim(1e4,3e6)
 
-            if ax.is_last_row():
+            if ax.get_subplotspec().is_last_row():
                 pl.xlabel(r'${\rm time}\ [{\rm Gyr}]$',fontsize=fs)
             pl.plot(times,ys,c='b',lw=0.7)    
         fig.savefig(figdir+'/quantities_at_Rcirc_%s.png'%(self),dpi=300)        
@@ -653,9 +673,9 @@ def sim_properties(sim, iSnapshots):
         pl.xlim(1,1000)
         ax.set_xscale('log')
         ax.xaxis.set_major_formatter(ff.u.arilogformatter)
-        if ax.is_last_row():
+        if ax.get_subplotspec().is_last_row():
             pl.xlabel(r'$r\ [{\rm kpc}]$')    
-        if ax.is_last_col():
+        if ax.get_subplotspec().is_last_col():
             ax.yaxis.set_label_position('right')
             ax.yaxis.set_ticks_position('right')
             ax.yaxis.set_ticks_position('both')
@@ -691,7 +711,7 @@ def CGM_properties(sim, iSnapshots,Rcirc):
             ax.set_yscale('log')
             pl.ylabel(r'$j_z = v_{\phi}r\ [{\rm kpc}\ {\rm km}\ {\rm s}^{-1}]$')
         if iPanel==2:
-            pl.ylim(0.05,2)
+            pl.ylim(0.01,2)
             ax.set_yscale('log'); ax.yaxis.set_major_formatter(ff.u.arilogformatter)
             pl.ylabel(r'$Z / Z_\odot$')
         if iPanel==3:
@@ -723,9 +743,9 @@ def CGM_properties(sim, iSnapshots,Rcirc):
         pl.xlim(3,300)
         ax.set_xscale('log')
         ax.xaxis.set_major_formatter(ff.u.arilogformatter)
-        if ax.is_last_row():
+        if ax.get_subplotspec().is_last_row():
             pl.xlabel(r'$r\ [{\rm kpc}]$')    
-        if ax.is_last_col():
+        if ax.get_subplotspec().is_last_col():
             ax.yaxis.set_label_position('right')
             ax.yaxis.set_ticks_position('right')
             ax.yaxis.set_ticks_position('both')
@@ -802,9 +822,9 @@ def compare_sims(sims, iSnapshot):
         pl.xlim(1,1000)
         ax.set_xscale('log')
         ax.xaxis.set_major_formatter(ff.u.arilogformatter)
-        if ax.is_last_row():
+        if ax.get_subplotspec().is_last_row():
             pl.xlabel(r'$r\ [{\rm kpc}]$')    
-        if ax.is_last_col():
+        if ax.get_subplotspec().is_last_col():
             ax.yaxis.set_label_position('right')
             ax.yaxis.set_ticks_position('right')
             ax.yaxis.set_ticks_position('both')
@@ -954,7 +974,7 @@ def param_figs_by_time_withMvirRcirc(sims,isRcirc,showOther=False,max_log_t_rati
             
         pl.xlim(0,14.)
         ax.xaxis.set_major_locator(ticker.MultipleLocator(2.))               
-        if ax.is_last_row():
+        if ax.get_subplotspec().is_last_row():
             pl.xlabel(r'${\rm time\ [Gyr]}$')                
         else:
             ax.xaxis.set_major_formatter(ticker.NullFormatter())
