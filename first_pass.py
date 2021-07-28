@@ -118,7 +118,15 @@ class SnapshotProjection:
         Xs = np.linspace(-self.r_max,self.r_max,columnMap.shape[0])
         return Xs,columnMap,quantityMap
 
+class PowerLawPotential:
+    def __init__(self,m,vc_Rvir,Rvir):
+        self.m = m
+        self.vc_Rvir = vc_Rvir
+        self.Rvir = Rvir
+    def vc(self, r):
+        return self.vc_Rvir * (r/self.Rvir)**self.m
 
+    
 class KY_snapshot(ff.Snapshot):    
     zvec = np.array([0,0,1.])
     def __init__(self,fn,sim,center):

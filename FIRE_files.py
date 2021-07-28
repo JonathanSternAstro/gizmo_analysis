@@ -622,7 +622,8 @@ class Snapshot_profiler:
         return np.pad((self.rs_midbins()[2:]-self.rs_midbins()[:-2])/2., 1, 'edge')
     def massProfile(self,iPartTypes = (0,1,2,4),minT=None):
         total_mass = np.zeros(self.log_r2rvir_bins.shape[0]-1)
-        for iPartType in iPartTypes:           
+        for iPartType in iPartTypes:     
+            if len(self.snapshot.dic[('PartType%d'%iPartType,'Masses')])==0: continue
             if minT==None or iPartType!=0:
                 save_name = 'massProfile%d'%iPartType
                 inds = Ellipsis
