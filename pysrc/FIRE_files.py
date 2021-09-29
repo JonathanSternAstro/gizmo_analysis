@@ -565,7 +565,6 @@ class Snapshot_profiler:
             
         np.savez(self.filename(),
                  rs_midbins=self.rs_midbins(),
-                 mvir = self.mvir,
                  rvir = self.rvir,
                  sub_halo_centers = self.sub_halo_centers,
                  sub_halo_rvirs = self.sub_halo_rvirs,
@@ -668,7 +667,9 @@ class Snapshot_profiler:
         return ((un.kpc / (un.km/un.s)).to('Myr') * 2**0.5 * self.rs_midbins() / self.vc())
     def nH(self,avoidGalaxy=False,useP=True,useTvir=False,limit_nH=True,maxR2Rvir=1.):
         if useP:
-            nH = X*mu * self.P2k_CGM(maxR2Rvir=maxR2Rvir) / (self.Tc(), self.Tvir())[useTvir]
+            if useTvir: T = self.Tvir()
+            else: T = self.Tc()
+            nH = X*mu * self.P2k_CGM(maxR2Rvir=maxR2Rvir) / T
         else:
             if avoidGalaxy: rho = self.rhoProfile_CGM()
             else: rho = self.rhoProfile()                

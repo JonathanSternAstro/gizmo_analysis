@@ -159,13 +159,13 @@ class KY_snapshot(ff.Snapshot):
             if self.sim.centerOnBlackHole:
                 self.center = self.peakDensity(5) 
             else:
-                self.center = self.peakDensity(1) 
+                self.center = self.peakDensity(0) 
         else:
             self.center = center
     def centerOfMass(self):
         DMmasses = self.dic[('PartType1','Masses')]
         return (self.dic[('PartType1','Coordinates')].T*DMmasses).sum(axis=1) / DMmasses.sum()                    
-    def peakDensity(self,iPartType=1):
+    def peakDensity(self,iPartType=0):
         if iPartType==5: return np.array([0,0,0]) #self.absCoords(5)[0]
              
         o = self.sim.origin
@@ -240,14 +240,13 @@ def calc_properties_for_time_series(loadvals,iSnapshot,rMdot,rVrot):
         
         T = 10.**prof.profile1D('log_Ts','VW')[ind]        
         Tc = prof.Tc()[ind]
-        Tvir = prof.Tvir()
         
         prof.tofile()
         print('ending snapshot #%d,   process id: %d'%(iSnapshot, os.getpid()),flush=True)
     except:
         traceback.print_exc() 
         raise # optional    
-    return time,SFR,Mdot,vc,v_phi,sigma,tcool,tcoolB,tff,nH,nHB,Z,vcRcirc, T, Tc, Tvir
+    return time,SFR,Mdot,vc,v_phi,sigma,tcool,tcoolB,tff,nH,nHB,Z,vcRcirc, T, Tc
         
 class KY_profiler(ff.Snapshot_profiler):
     z = 0 #for cooling function and critical density calculation
@@ -256,9 +255,9 @@ class KY_profiler(ff.Snapshot_profiler):
         self.Rcirc2Rvir = Rcirc2Rvir
         if not isinstance(snapshot,tuple):
             self.snapshot = snapshot
-            self.galaxyname, self.time, self.mvir, self.rvir = self.snapshot.sim.galaxyname,self.snapshot.time(),self.snapshot.sim.mvir.value,self.snapshot.sim.rvir.value
+            self.galaxyname, self.time, self.rvir = self.snapshot.sim.galaxyname,self.snapshot.time(),self.snapshot.sim.rvir.value
         else:
-            self.galaxyname, self.time, self.mvir, self.rvir = snapshot
+            self.galaxyname, self.time, self.rvir = snapshot
         self._saveDic = {}        
         self.recalc = recalc
         self.load()
@@ -288,11 +287,10 @@ class KY_sim:
     a = 1
     h = 1
     sub_halo_centers = sub_halo_rvirs = sub_halo_gasMasses = None
-    def __init__(self,simname,snapshots_dir,mvir,rvir,dynamicCentering=False,recalc=False,
+    def __init__(self,simname,snapshots_dir,rvir=100*un.kpc,dynamicCentering=False,recalc=False,
                  centerOnBlackHole=False,origin=([1500,1500,1500]),Nsnapshots=None,analyticGravity=None,
-                 Rcirc=None):        
-        self.mvir = mvir
-        self.rvir = rvir
+                 Rcirc=None):              
+        self.rvir = rvir #meaningless, used for defining bins in units of rvir
         self.Rcirc = Rcirc
         self.origin = origin
         fns = sorted(glob.glob(snapshots_dir+'*snapshot_*.hdf5'),key=lambda fn: int(fn.split('_')[-1][:-5]))
@@ -307,7 +305,7 @@ class KY_sim:
         self.centerOnBlackHole = centerOnBlackHole
         self.analyticGravity = analyticGravity
         self.snapshots[0] = KY_snapshot(self.fns_dic[0],self,center=None) #for calculating center
-        self.loadvals = (simname,snapshots_dir,mvir,rvir,dynamicCentering,recalc,
+        self.loadvals = (simname,snapshots_dir,rvir,dynamicCentering,recalc,
                          centerOnBlackHole,origin,Nsnapshots,analyticGravity,Rcirc)
         #print([('PartType%d'%iPartType, len(self.snapshots[0].masses(iPartType))) for iPartType in range(6)])
         
@@ -355,7 +353,6 @@ class KY_sim:
         vcRcircs = np.zeros(self.Nsnapshots())
         Ts = np.zeros(self.Nsnapshots())
         Tcs = np.zeros(self.Nsnapshots())
-        Tvirs = np.zeros(self.Nsnapshots())
         
         for iSnapshot in u.Progress(range(self.Nsnapshots())):
             res = calc_properties_for_time_series(self.loadvals,iSnapshot,rMdot,rVrot)
@@ -363,15 +360,15 @@ class KY_sim:
              vcs[iSnapshot],Vrots[iSnapshot],sigmas[iSnapshot],
              tcools[iSnapshot],tcoolBs[iSnapshot],tffs[iSnapshot],
              nHs[iSnapshot],nHsB[iSnapshot],Zs[iSnapshot],vcRcircs[iSnapshot],
-             Ts[iSnapshot],Tcs[iSnapshot],Tvirs[iSnapshot])= res
+             Ts[iSnapshot],Tcs[iSnapshot])= res
         SFR_means = np.convolve(SFRs,np.ones(SFRwindow)/SFRwindow,mode='same')
         
         np.savez(profiledir + 'timeSeries_%s.npz'%self,
                  times=times,SFRs=SFRs,SFRmeans = SFR_means,Mdots=Mdots,
                  Vrots=Vrots,sigmas = sigmas,vcs=vcs,
                  tcools=tcools,tffs=tffs,tcoolBs=tcoolBs,
-                 nHs = nHs,nHsB=nHsB,Zs=Zs,vcRcircs=vcRcircs, Ts=Ts,Tcs=Tcs,Tvirs=Tvirs)
-        return times, SFRs, Mdots, vcs, Vrots, sigmas, tcools, tcoolBs, tffs, nHs, nHsB, Zs, Ts,Tcs,Tvirs
+                 nHs = nHs,nHsB=nHsB,Zs=Zs,vcRcircs=vcRcircs, Ts=Ts,Tcs=Tcs)
+        return times, SFRs, Mdots, vcs, Vrots, sigmas, tcools, tcoolBs, tffs, nHs, nHsB, Zs, Ts,Tcs
     def movie(self,frameFunc,multipleProcs=1,start=None,end=None,**kwargs):        
         pool = multiprocessing.Pool(processes=multipleProcs,maxtasksperchild=1)
         for iSnapshot in range(self.Nsnapshots())[start:end]:
@@ -383,9 +380,9 @@ class KY_sim:
         f = np.load(profiledir + 'timeSeries_%s.npz'%self)
         timeSeries = (f['times'],f['SFRs'],f['SFRmeans'],f['Mdots'], f['Vrots'], f['sigmas'], 
                       f['vcs'], f['tcools'], f['tffs'], f['nHs'], f['Zs'], f['vcRcircs'], 
-                      f['Ts'],f['Tcs'],f['Tvirs'])
+                      f['Ts'],f['Tcs'])
         (times, SFRs, SFRs_means, Mdots, Vrots, sigmas, vcs, tcools, 
-         tffs, nHs, Zs, vcRcircs, Ts, Tcs, Tvirs) = timeSeries
+         tffs, nHs, Zs, vcRcircs, Ts, Tcs) = timeSeries
         
     
         fig = pl.figure(figsize=(ff.pB.fig_width_full,6.5))
