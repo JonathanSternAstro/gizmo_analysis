@@ -289,7 +289,7 @@ class KY_sim:
     sub_halo_centers = sub_halo_rvirs = sub_halo_gasMasses = None
     def __init__(self,simname,snapshots_dir,rvir=100*un.kpc,dynamicCentering=False,recalc=False,
                  centerOnBlackHole=False,origin=([1500,1500,1500]),Nsnapshots=None,analyticGravity=None,
-                 Rcirc=None):              
+                 Rcirc=None,snapshot_dt_Myr=25):              
         self.rvir = rvir #meaningless, used for defining bins in units of rvir
         self.Rcirc = Rcirc
         self.origin = origin
@@ -307,6 +307,7 @@ class KY_sim:
         self.snapshots[0] = KY_snapshot(self.fns_dic[0],self,center=None) #for calculating center
         self.loadvals = (simname,snapshots_dir,rvir,dynamicCentering,recalc,
                          centerOnBlackHole,origin,Nsnapshots,analyticGravity,Rcirc)
+        self.snapshot_dt_Myr = snapshot_dt_Myr
         #print([('PartType%d'%iPartType, len(self.snapshots[0].masses(iPartType))) for iPartType in range(6)])
         
     def __str__(self):
@@ -330,7 +331,7 @@ class KY_sim:
         [self.getSnapshot(iSnapshot) for iSnapshot in self.fns_dic.keys()]
     def times(self):
         return [snapshot.time() for snapshot in self.snapshots]
-    def timeSeries(self,rMdot,rVrot,multipleProcs=1,justLoad=False,SFRwindow=300//10):        
+    def timeSeries(self,rMdot,rVrot,multipleProcs=1,justLoad=False,SFRwindow_Myr=300):        
         if not justLoad:            
             pool = multiprocessing.Pool(processes=multipleProcs,maxtasksperchild=1)
             for iSnapshot in range(self.Nsnapshots()):
@@ -361,6 +362,7 @@ class KY_sim:
              tcools[iSnapshot],tcoolBs[iSnapshot],tffs[iSnapshot],
              nHs[iSnapshot],nHsB[iSnapshot],Zs[iSnapshot],vcRcircs[iSnapshot],
              Ts[iSnapshot],Tcs[iSnapshot])= res
+        SFRwindow = SFRwindow_Myr // self.snapshot_dt_Myr
         SFR_means = np.convolve(SFRs,np.ones(SFRwindow)/SFRwindow,mode='same')
         
         np.savez(profiledir + 'timeSeries_%s.npz'%self,
