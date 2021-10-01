@@ -195,10 +195,12 @@ class KY_snapshot(ff.Snapshot):
         return self.f['Header'].attrs['NumPart_ThisFile']
     def vs(self): # in km/s
         return self.dic[('PartType0','Velocities')]
-    def v_phi(self):
-        return ff.Snapshot.v_phi(self,self.zvec)
-    def v_theta(self):
-        return ff.Snapshot.v_theta(self,self.zvec)
+    def v_phi(self,zvec=None):
+        if zvec is None: zvec=self.zvec
+        return ff.Snapshot.v_phi(self,zvec)
+    def v_theta(self,zvec=None):
+        if zvec is None: zvec=self.zvec
+        return ff.Snapshot.v_theta(self,zvec)
     def cos_theta(self):
         return ff.Snapshot.cos_theta(self,self.zvec)
     def phi(self,iPartType=0):
@@ -437,7 +439,6 @@ class KY_sim:
                 pl.ylabel(r'$T\ {\rm at}\ \ 30\ {\rm kpc}\ [[{\rm K}]$',fontsize=fs)
                 ax.yaxis.set_major_formatter(u.arilogformatter)
                 pl.plot(times,Tcs,ls='--',c='k')
-                pl.plot(times,Tvirs,ls=':',c='k')
                 pl.ylim(1e4,3e6)
 
             if ax.get_subplotspec().is_last_row():
