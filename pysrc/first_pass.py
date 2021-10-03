@@ -1,29 +1,11 @@
 import sys, os, subprocess, multiprocessing, traceback
 homedir = os.getenv("HOME")+'/'
 
-if 'jonathan/' in homedir:
-    basedir = homedir+'Dropbox/jonathanmain/CGM/rapidCoolingCGM/'
-    tables_dir=basedir+'../data/CoolingTables/'
-elif 'jovyan' in homedir:
-    basedir = homedir+'fire_analysis/'
-    tables_dir=basedir+'CoolingTables/'
-else:
-    basedir = homedir+'jonathanmain/CGM/rapidCoolingCGM/'
-    tables_dir=basedir+'../data/CoolingTables/'
-if 'tg839127' in homedir:
-    pyobjDir = '/work/04613/tg839127/simulation_data/FIRE/no_yt/'
-elif 'ysz5546' in homedir:
-    pyobjDir = '/projects/b1026/jonathan/analysis_pyobjs/no_yt/'
-else:
-    pyobjDir = basedir+'pyobj/no_yt_analysis/'
+basedir = homedir+'fire_analysis/'
+tables_dir=basedir+'CoolingTables/'
+projectdir = basedir
+simdir = project_workdir = homedir+'/data/'
 
-if 'ysz5546' in homedir:
-    projectdir = homedir+'jonathanmain/CGM/KY_sims/'
-    project_workdir = '/projects/b1026/jonathan/KY_sims/'
-    simdir = project_workdir+'sim_outputs/'
-if 'jovyan' in homedir:
-    projectdir = basedir
-    simdir = project_workdir = homedir+'/data/'
 profiledir = projectdir + 'radialProfiles/'
 figdir = projectdir+'figures/'
 moviedir = projectdir+'figures/movieFrames/'
@@ -40,10 +22,11 @@ import h5py
 import scipy, scipy.stats
 from matplotlib import ticker
 
-#import abg_python
-#import abg_python.snapshot_utils
-#import firestudio
-#from firestudio.studios.gas_studio import GasStudio
+sys.path.append(basedir+'FIRE_studio/')
+import abg_python
+import abg_python.snapshot_utils
+import firestudio
+from firestudio.studios.gas_studio import GasStudio
 
 Z_solar = 0.0129
 gamma = 5/3.
