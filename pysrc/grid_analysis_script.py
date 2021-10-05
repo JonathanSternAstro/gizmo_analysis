@@ -5,7 +5,7 @@ from numpy import log10 as log
 from astropy import units as un, constants as cons
 import scipy, scipy.stats
 from matplotlib import ticker
-sys.path.append('../pysrc')
+
 
 import FIRE_files as ff
 from FIRE_files import cosmo, u
