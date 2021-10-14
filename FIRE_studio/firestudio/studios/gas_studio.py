@@ -172,6 +172,8 @@ class GasStudio(Studio):
             massWeightedQuantityMap, 
             "massWeighted%sMap"%self.quantity_name.title(),
             overwrite=self.overwrite)
+        
+        return columnDensityMap, massWeightedQuantityMap 
 
 ####### produceImage implementation #######
     def produceImage(self,image_names):

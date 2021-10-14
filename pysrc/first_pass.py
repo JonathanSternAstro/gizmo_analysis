@@ -9,7 +9,7 @@ simdir = project_workdir = homedir+'/data/'
 profiledir = projectdir + 'radialProfiles/'
 figdir = projectdir+'figures/'
 moviedir = projectdir+'figures/movieFrames/'
-projectionsdir = project_workdir+'projections/'
+projectionsdir = projectdir+'projections/'
 
 import FIRE_files as ff
 from FIRE_files import cosmo, u
