@@ -82,7 +82,7 @@ def ratio_comparison_group_plot(sims,timeSeriesDic,x1,x2,y1,y2,groupfunc,groupdi
         if group not in tups: tups[group] = [np.array([]),np.array([])]
         tups[group][0] = np.concatenate([tups[group][0], f[x1][inds]/f[x2][inds]])
         tups[group][1] = np.concatenate([tups[group][1], f[y1][inds]/f[y2][inds]])        
-    for group in tups:       
+    for group in sorted(tups):       
         pl.plot( tups[group][0], tups[group][1],ls='none',marker=',',alpha=0.25,c='.3')
         m,x,_ = scipy.stats.binned_statistic(tups[group][0],tups[group][1],statistic='median', bins=bins)
         c,x,_ = scipy.stats.binned_statistic(tups[group][0],tups[group][1],statistic='count', bins=bins)   
@@ -99,7 +99,7 @@ def ratio_comparison_group_plot(sims,timeSeriesDic,x1,x2,y1,y2,groupfunc,groupdi
         ax.yaxis.set_major_formatter(u.arilogformatter)    
     if y1=='logSFRs_std':
         pl.ylim(0,0.75)
-        pl.legend(fontsize=7,ncol=1,loc='upper left')    
+        pl.legend(fontsize=7,ncol=2,loc='upper left')    
         pl.ylabel(r'$\sigma(\log {\rm SFR})$ dex')
     elif y1=='nHs':
         pl.ylim(1e-5,0.003)
@@ -110,11 +110,11 @@ def ratio_comparison_group_plot(sims,timeSeriesDic,x1,x2,y1,y2,groupfunc,groupdi
         pl.ylabel(r'%s pressure at 30 kpc [K cm$^{-3}$]'%y1[4:])
         pl.legend(fontsize=7,ncol=1,loc='lower left')    
     else: 
-        pl.ylim(0.05,3)
+        pl.ylim(0.01,3)
         pl.legend(fontsize=7,ncol=1,loc='lower right')    
     if x1=='P2ks':
         pl.xlim(1,3e3)
         pl.xlabel(r'pressure at 30 kpc [K cm$^{-3}$]')
     else:
-        pl.xlim(0.1,50)      
+        pl.xlim(0.02,50)      
     

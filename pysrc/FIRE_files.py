@@ -744,7 +744,7 @@ class Snapshot_profiler:
     def sfh_zbins(self,dt=0.01,maxz=10):
         zs = np.arange(0,maxz+0.5e-3,1e-3)
         ages = np.arange(cosmo.age(maxz).value,cosmo.age(0.).value,dt)
-        zbins = np.interp(ages,cosmo.age(zs)[::-1],zs[::-1])
+        zbins = np.interp(ages,cosmo.age(zs)[::-1].value,zs[::-1])
         return zbins[zbins<maxz][::-1], dt
     
     def stellar_ages(self,zbins,max_r2rvir=0.1):

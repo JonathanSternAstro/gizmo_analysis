@@ -23,10 +23,10 @@ import scipy, scipy.stats
 from matplotlib import ticker
 
 sys.path.append(basedir+'FIRE_studio/')
-import abg_python
-import abg_python.snapshot_utils
-import firestudio
-from firestudio.studios.gas_studio import GasStudio
+#import abg_python
+#import abg_python.snapshot_utils
+#import firestudio
+#from firestudio.studios.gas_studio import GasStudio
 
 Z_solar = 0.0129
 gamma = 5/3.
