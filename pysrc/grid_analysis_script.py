@@ -42,4 +42,3 @@ for sim in sims:
         for iSnapshot in range(sim.Nsnapshots()):
             l.temperature_and_pressure_movieFrame_async(sim.loadvals,iSnapshot,
             calculateProjections=True,edge_on=edge_on,lazy=True)
-                    

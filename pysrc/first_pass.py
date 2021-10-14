@@ -198,6 +198,7 @@ def calc_properties_for_time_series(loadvals,iSnapshot,rMdot,rVrot):
     
         prof = sim.getProfiler(iSnapshot)
         SFR = prof.SFRprofile().sum() 
+        stellar_ages = prof.stellar_ages(zbins)        
     
         ind = np.searchsorted(prof.rs_midbins(),rMdot.to('kpc').value)
         Mdot = prof.MdotProfile()[ind]
@@ -231,7 +232,7 @@ def calc_properties_for_time_series(loadvals,iSnapshot,rMdot,rVrot):
     except:
         traceback.print_exc() 
         raise # optional    
-    return time,SFR,Mdot,vc,v_phi,sigma,tcool,tcoolB,tff,nH,nHB,Z,vcRcirc, T, Tc
+    return time,SFR,Mdot,vc,v_phi,sigma,tcool,tcoolB,tff,nH,nHB,Z,vcRcirc, T, Tc, zbins, stellar_ages
         
 class KY_profiler(ff.Snapshot_profiler):
     z = 0 #for cooling function and critical density calculation
@@ -253,6 +254,15 @@ class KY_profiler(ff.Snapshot_profiler):
             analytic_vcs = self.snapshot.sim.analyticGravity.vc(self.rs_midbins()).to('km/s').value
             vc = (vc**2 + analytic_vcs**2)**0.5
         return vc
+    def stellar_ages(self,time_bins=np.arange(0,30,0.01),max_r=10):
+        if not self.isSaved('stellar_ages'):            
+            times = self.snapshot.StarFormationTimes()
+            masses = self.snapshot.masses(4)
+            inds = self.snapshot.rs(4) < max_r
+            # TODO: fix for mass loss
+            hist,x,_ = scipy.stats.binned_statistic(times[inds],masses[inds],statistic='sum',bins=time_bins)   
+            self.save('stellar_ages', hist)            
+        return self.get_saved('stellar_ages')
     
     def filename(self):
         return profiledir + '%s/profiler_%.0fMyr.npz'%(self.galaxyname,self.time*1000)
@@ -339,6 +349,8 @@ class KY_sim:
         vcRcircs = np.zeros(self.Nsnapshots())
         Ts = np.zeros(self.Nsnapshots())
         Tcs = np.zeros(self.Nsnapshots())
+        zbins = np.zeros(self.Nsnapshots())
+        stellar_ages = np.zeros(self.Nsnapshots())
         
         for iSnapshot in u.Progress(range(self.Nsnapshots())):
             res = calc_properties_for_time_series(self.loadvals,iSnapshot,rMdot,rVrot)
@@ -346,7 +358,7 @@ class KY_sim:
              vcs[iSnapshot],Vrots[iSnapshot],sigmas[iSnapshot],
              tcools[iSnapshot],tcoolBs[iSnapshot],tffs[iSnapshot],
              nHs[iSnapshot],nHsB[iSnapshot],Zs[iSnapshot],vcRcircs[iSnapshot],
-             Ts[iSnapshot],Tcs[iSnapshot])= res
+             Ts[iSnapshot],Tcs[iSnapshot],zbins[iSnapshot], stellar_ages[iSnapshot])= res
         SFRwindow = SFRwindow_Myr // self.snapshot_dt_Myr
         SFR_means = np.convolve(SFRs,np.ones(SFRwindow)/SFRwindow,mode='same')
         
@@ -355,7 +367,7 @@ class KY_sim:
                  Vrots=Vrots,sigmas = sigmas,vcs=vcs,
                  tcools=tcools,tffs=tffs,tcoolBs=tcoolBs,
                  nHs = nHs,nHsB=nHsB,Zs=Zs,vcRcircs=vcRcircs, Ts=Ts,Tcs=Tcs)
-        return times, SFRs, Mdots, vcs, Vrots, sigmas, tcools, tcoolBs, tffs, nHs, nHsB, Zs, Ts,Tcs
+        return times, SFRs, Mdots, vcs, Vrots, sigmas, tcools, tcoolBs, tffs, nHs, nHsB, Zs, Ts,Tcs, zbins, stellar_ages
     def movie(self,frameFunc,multipleProcs=1,start=None,end=None,**kwargs):        
         pool = multiprocessing.Pool(processes=multipleProcs,maxtasksperchild=1)
         for iSnapshot in range(self.Nsnapshots())[start:end]:
