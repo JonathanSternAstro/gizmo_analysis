@@ -237,6 +237,7 @@ def calc_properties_for_time_series(loadvals,iSnapshot,rMdot,rVrot):
 class KY_profiler(ff.Snapshot_profiler):
     z = 0 #for cooling function and critical density calculation
     sub_halo_centers = sub_halo_rvirs = sub_halo_gasMasses = None
+    stellar_ages_time_bins = np.arange(0,30,0.01)
     def __init__(self,snapshot,Rcirc2Rvir,recalc=False):        
         self.Rcirc2Rvir = Rcirc2Rvir
         if not isinstance(snapshot,tuple):
@@ -254,13 +255,13 @@ class KY_profiler(ff.Snapshot_profiler):
             analytic_vcs = self.snapshot.sim.analyticGravity.vc(self.rs_midbins()).to('km/s').value
             vc = (vc**2 + analytic_vcs**2)**0.5
         return vc
-    def stellar_ages(self,time_bins=np.arange(0,30,0.01),max_r=10):
+    def stellar_ages(self,max_r=10):
         if not self.isSaved('stellar_ages'):            
             times = self.snapshot.StarFormationTimes()
             masses = self.snapshot.masses(4)
             inds = self.snapshot.rs(4) < max_r
             # TODO: fix for mass loss
-            hist,x,_ = scipy.stats.binned_statistic(times[inds],masses[inds],statistic='sum',bins=time_bins)   
+            hist,x,_ = scipy.stats.binned_statistic(times[inds],masses[inds],statistic='sum',bins=self.stellar_ages_time_bins)   
             self.save('stellar_ages', hist)            
         return self.get_saved('stellar_ages')
     
