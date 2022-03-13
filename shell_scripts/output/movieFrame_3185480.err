@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "../pysrc/profiles_and_projections_script.py", line 35, in <module>
-    import first_pass as l
-  File "/home/ysz5546/github_repositories/gizmo_analysis/pysrc/first_pass.py", line 6
-    projectdir = '/projects/b1026/jonathan/KY_sims/
-                                                  ^
-SyntaxError: EOL while scanning string literal
