@@ -1,10 +1,16 @@
 import sys, os, subprocess, multiprocessing, traceback
 homedir = os.getenv("HOME")+'/'
 
-basedir = homedir+'fire_analysis/'
+if 'ysz5546' in homedir:
+    basedir = homedir+'github_repositories/gizmo_analysis/'
+    projectdir = '/projects/b1026/jonathan/KY_sims/'
+    simdir = project_workdir = projectdir+'sim_outputs/'
+else:
+    basedir = homedir+'fire_analysis/'
+    projectdir = basedir
+    simdir = project_workdir = homedir+'/data/'
+
 tables_dir=basedir+'CoolingTables/'
-projectdir = basedir
-simdir = project_workdir = homedir+'/data/'
 
 profiledir = projectdir + 'radialProfiles/'
 figdir = projectdir+'figures/'
@@ -198,7 +204,7 @@ def calc_properties_for_time_series(loadvals,iSnapshot,rMdot,rVrot):
     
         prof = sim.getProfiler(iSnapshot)
         SFR = prof.SFRprofile().sum() 
-        stellar_ages = prof.stellar_ages(zbins)        
+        stellar_ages = prof.stellar_ages()        
     
         ind = np.searchsorted(prof.rs_midbins(),rMdot.to('kpc').value)
         Mdot = prof.MdotProfile()[ind]
@@ -232,7 +238,7 @@ def calc_properties_for_time_series(loadvals,iSnapshot,rMdot,rVrot):
     except:
         traceback.print_exc() 
         raise # optional    
-    return time,SFR,Mdot,vc,v_phi,sigma,tcool,tcoolB,tff,nH,nHB,Z,vcRcirc, T, Tc, zbins, stellar_ages
+    return time,SFR,Mdot,vc,v_phi,sigma,tcool,tcoolB,tff,nH,nHB,Z,vcRcirc, T, Tc, stellar_ages
         
 class KY_profiler(ff.Snapshot_profiler):
     z = 0 #for cooling function and critical density calculation
@@ -350,7 +356,6 @@ class KY_sim:
         vcRcircs = np.zeros(self.Nsnapshots())
         Ts = np.zeros(self.Nsnapshots())
         Tcs = np.zeros(self.Nsnapshots())
-        zbins = np.zeros(self.Nsnapshots())
         stellar_ages = np.zeros(self.Nsnapshots())
         
         for iSnapshot in u.Progress(range(self.Nsnapshots())):
@@ -359,7 +364,7 @@ class KY_sim:
              vcs[iSnapshot],Vrots[iSnapshot],sigmas[iSnapshot],
              tcools[iSnapshot],tcoolBs[iSnapshot],tffs[iSnapshot],
              nHs[iSnapshot],nHsB[iSnapshot],Zs[iSnapshot],vcRcircs[iSnapshot],
-             Ts[iSnapshot],Tcs[iSnapshot],zbins[iSnapshot], stellar_ages[iSnapshot])= res
+             Ts[iSnapshot],Tcs[iSnapshot],stellar_ages[iSnapshot])= res
         SFRwindow = SFRwindow_Myr // self.snapshot_dt_Myr
         SFR_means = np.convolve(SFRs,np.ones(SFRwindow)/SFRwindow,mode='same')
         
@@ -368,7 +373,7 @@ class KY_sim:
                  Vrots=Vrots,sigmas = sigmas,vcs=vcs,
                  tcools=tcools,tffs=tffs,tcoolBs=tcoolBs,
                  nHs = nHs,nHsB=nHsB,Zs=Zs,vcRcircs=vcRcircs, Ts=Ts,Tcs=Tcs)
-        return times, SFRs, Mdots, vcs, Vrots, sigmas, tcools, tcoolBs, tffs, nHs, nHsB, Zs, Ts,Tcs, zbins, stellar_ages
+        return times, SFRs, Mdots, vcs, Vrots, sigmas, tcools, tcoolBs, tffs, nHs, nHsB, Zs, Ts,Tcs, stellar_ages
     def movie(self,frameFunc,multipleProcs=1,start=None,end=None,**kwargs):        
         pool = multiprocessing.Pool(processes=multipleProcs,maxtasksperchild=1)
         for iSnapshot in range(self.Nsnapshots())[start:end]:
@@ -439,7 +444,7 @@ class KY_sim:
                 pl.plot(times,Tcs,ls='--',c='k')
                 pl.ylim(1e4,3e6)
 
-            if ax.get_subplotspec().is_last_row():
+            if ax.is_last_row():
                 pl.xlabel(r'${\rm time}\ [{\rm Gyr}]$',fontsize=fs)
             pl.plot(times,ys,c='b',lw=0.7)    
         fig.savefig(figdir+'/quantities_at_Rcirc_%s.png'%(self),dpi=300)        
@@ -669,15 +674,17 @@ def sim_properties(sim, iSnapshots):
         pl.xlim(1,1000)
         ax.set_xscale('log')
         ax.xaxis.set_major_formatter(ff.u.arilogformatter)
-        if ax.get_subplotspec().is_last_row():
+        if ax.is_last_row():
             pl.xlabel(r'$r\ [{\rm kpc}]$')    
-        if ax.get_subplotspec().is_last_col():
+        if ax.is_last_col():
             ax.yaxis.set_label_position('right')
             ax.yaxis.set_ticks_position('right')
             ax.yaxis.set_ticks_position('both')
     pl.text(0.5,0.95,sim.galaxyname,ha='center',transform=fig.transFigure)
     pl.savefig(figdir+'sim_properties_%s.pdf'%sim.galaxyname)    
 def CGM_properties(sim, iSnapshots,Rcirc):
+    pl.ioff()
+
     fig = pl.figure(figsize=(10,10))
     pl.subplots_adjust(wspace=0.3)
     for iPanel in range(9):
@@ -739,9 +746,9 @@ def CGM_properties(sim, iSnapshots,Rcirc):
         pl.xlim(3,300)
         ax.set_xscale('log')
         ax.xaxis.set_major_formatter(ff.u.arilogformatter)
-        if ax.get_subplotspec().is_last_row():
+        if ax.is_last_row():
             pl.xlabel(r'$r\ [{\rm kpc}]$')    
-        if ax.get_subplotspec().is_last_col():
+        if ax.is_last_col():
             ax.yaxis.set_label_position('right')
             ax.yaxis.set_ticks_position('right')
             ax.yaxis.set_ticks_position('both')
@@ -818,9 +825,9 @@ def compare_sims(sims, iSnapshot):
         pl.xlim(1,1000)
         ax.set_xscale('log')
         ax.xaxis.set_major_formatter(ff.u.arilogformatter)
-        if ax.get_subplotspec().is_last_row():
+        if ax.is_last_row():
             pl.xlabel(r'$r\ [{\rm kpc}]$')    
-        if ax.get_subplotspec().is_last_col():
+        if ax.is_last_col():
             ax.yaxis.set_label_position('right')
             ax.yaxis.set_ticks_position('right')
             ax.yaxis.set_ticks_position('both')
@@ -970,7 +977,7 @@ def param_figs_by_time_withMvirRcirc(sims,isRcirc,showOther=False,max_log_t_rati
             
         pl.xlim(0,14.)
         ax.xaxis.set_major_locator(ticker.MultipleLocator(2.))               
-        if ax.get_subplotspec().is_last_row():
+        if ax.is_last_row():
             pl.xlabel(r'${\rm time\ [Gyr]}$')                
         else:
             ax.xaxis.set_major_formatter(ticker.NullFormatter())

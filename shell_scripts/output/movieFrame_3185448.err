@@ -1,0 +1,31 @@
+/home/ysz5546/github_repositories/gizmo_analysis/pysrc/FIRE_files.py:730: RuntimeWarning: invalid value encountered in true_divide
+  self.save('j_vec_x'+suffix, hist[1,:] / hist[0,:])
+/home/ysz5546/github_repositories/gizmo_analysis/pysrc/FIRE_files.py:731: RuntimeWarning: invalid value encountered in true_divide
+  self.save('j_vec_y'+suffix, hist[2,:] / hist[0,:])
+/home/ysz5546/github_repositories/gizmo_analysis/pysrc/FIRE_files.py:732: RuntimeWarning: invalid value encountered in true_divide
+  self.save('j_vec_z'+suffix, hist[3,:] / hist[0,:])
+/home/ysz5546/github_repositories/gizmo_analysis/pysrc/FIRE_files.py:865: RuntimeWarning: invalid value encountered in true_divide
+  normed_hist = [hist[i,:]/hist[0,:] for i in range(1,hist.shape[0])]
+/home/ysz5546/github_repositories/gizmo_analysis/pysrc/FIRE_files.py:89: RuntimeWarning: divide by zero encountered in log10
+  f_H_He((log(T), log(nH))) + f_Z((log(T), log(nH))) * Z2Zsun )
+/home/ysz5546/miniconda3/lib/python3.7/site-packages/scipy/interpolate/interpolate.py:2506: RuntimeWarning: invalid value encountered in add
+  values += np.asarray(self.values[edge_indices]) * weight[vslice]
+WARNING: nan_treatment='interpolate', however, NaN values detected post convolution. A contiguous region of NaN values, larger than the kernel size, are present in the input array. Increase the kernel size to avoid this. [astropy.convolution.convolve]
+Traceback (most recent call last):
+  File "../pysrc/profiles_and_projections_script.py", line 53, in <module>
+    l.CGM_properties(sim, iSnapshots,Rcirc=10)
+  File "/home/ysz5546/github_repositories/gizmo_analysis/pysrc/first_pass.py", line 751, in CGM_properties
+    pl.savefig(figdir+'CGM_properties_%s.pdf'%sim.galaxyname)    
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/pyplot.py", line 689, in savefig
+    res = fig.savefig(*args, **kwargs)
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/figure.py", line 2094, in savefig
+    self.canvas.print_figure(fname, **kwargs)
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/backend_bases.py", line 2075, in print_figure
+    **kwargs)
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/backends/backend_pdf.py", line 2558, in print_pdf
+    file = PdfFile(filename, metadata=metadata)
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/backends/backend_pdf.py", line 433, in __init__
+    fh, opened = cbook.to_filehandle(filename, "wb", return_opened=True)
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/cbook/__init__.py", line 392, in to_filehandle
+    fh = open(fname, flag, encoding=encoding)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/ysz5546/fire_analysis/figures/CGM_properties_cooling_only_low_SF_threshold11.pdf'

@@ -28,6 +28,9 @@ import scipy, scipy.stats
 from matplotlib import ticker
 from importlib import reload
 
+matplotlib.use('Agg')
+pl.ioff()
+
 
 import first_pass as l
 cmap = pl.get_cmap('viridis')
@@ -38,9 +41,7 @@ simname = sys.argv[1]
 vc = float(sys.argv[2])
 
 simdir = '/projects/b1026/jonathan/my_gizmo/%s/output/'%simname
-sim = l.KY_sim(simname,simdir,5e11*un.Msun,200*un.kpc,
-               dynamicCentering=True,recalc=False,centerOnBlackHole=True,Nsnapshots=None,
-               origin=np.zeros(3),Rcirc = 10*un.kpc,
+sim = l.KY_sim(simname,simdir,200*un.kpc,origin=np.zeros(3),Rcirc = 10*un.kpc,snapshot_dt_Myr=10,
               analyticGravity= Halo.PowerLaw(m=0.,vc_Rvir=vc*un.km/un.s,Rvir=200*un.kpc))
 
 print(sim.galaxyname, sim.Nsnapshots())

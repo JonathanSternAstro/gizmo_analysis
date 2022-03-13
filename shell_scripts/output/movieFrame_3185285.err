@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "../pysrc/profiles_and_projections_script.py", line 44, in <module>
+    analyticGravity= Halo.PowerLaw(m=0.,vc_Rvir=vc*un.km/un.s,Rvir=200*un.kpc))
+TypeError: __init__() got multiple values for argument 'dynamicCentering'

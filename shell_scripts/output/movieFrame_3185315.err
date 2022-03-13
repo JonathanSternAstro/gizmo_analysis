@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "../pysrc/profiles_and_projections_script.py", line 50, in <module>
+    l.CGM_properties(sim, iSnapshots,Rcirc=10)
+  File "/home/ysz5546/github_repositories/gizmo_analysis/pysrc/first_pass.py", line 681, in CGM_properties
+    fig = pl.figure(figsize=(10,10))
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/pyplot.py", line 525, in figure
+    **kwargs)
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/backend_bases.py", line 3218, in new_figure_manager
+    return cls.new_figure_manager_given_figure(num, fig)
+  File "/home/ysz5546/miniconda3/lib/python3.7/site-packages/matplotlib/backends/_backend_tk.py", line 1008, in new_figure_manager_given_figure
+    window = Tk.Tk(className="matplotlib")
+  File "/home/ysz5546/miniconda3/lib/python3.7/tkinter/__init__.py", line 2023, in __init__
+    self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+_tkinter.TclError: couldn't connect to display "localhost:17.0"
