@@ -28,11 +28,11 @@ import h5py
 import scipy, scipy.stats
 from matplotlib import ticker
 
-sys.path.append(basedir+'FIRE_studio/')
-#import abg_python
-#import abg_python.snapshot_utils
-#import firestudio
-#from firestudio.studios.gas_studio import GasStudio
+sys.path.append('../FIRE_studio/')
+import abg_python
+import abg_python.snapshot_utils
+import firestudio
+from firestudio.studios.gas_studio import GasStudio
 
 Z_solar = 0.0129
 gamma = 5/3.
@@ -263,11 +263,14 @@ class KY_profiler(ff.Snapshot_profiler):
         return vc
     def stellar_ages(self,max_r=10):
         if not self.isSaved('stellar_ages'):            
-            times = self.snapshot.StarFormationTimes()
             masses = self.snapshot.masses(4)
-            inds = self.snapshot.rs(4) < max_r
-            # TODO: fix for mass loss
-            hist,x,_ = scipy.stats.binned_statistic(times[inds],masses[inds],statistic='sum',bins=self.stellar_ages_time_bins)   
+            if len(masses)==0: 
+                hist = np.zeros(self.stellar_ages_time_bins.shape[0]-1)
+            else:
+                times = self.snapshot.StarFormationTimes()
+                inds = self.snapshot.rs(4) < max_r
+                # TODO: fix for mass loss
+                hist,x,_ = scipy.stats.binned_statistic(times[inds],masses[inds],statistic='sum',bins=self.stellar_ages_time_bins)   
             self.save('stellar_ages', hist)            
         return self.get_saved('stellar_ages')
     
@@ -364,7 +367,7 @@ class KY_sim:
              vcs[iSnapshot],Vrots[iSnapshot],sigmas[iSnapshot],
              tcools[iSnapshot],tcoolBs[iSnapshot],tffs[iSnapshot],
              nHs[iSnapshot],nHsB[iSnapshot],Zs[iSnapshot],vcRcircs[iSnapshot],
-             Ts[iSnapshot],Tcs[iSnapshot],stellar_ages[iSnapshot])= res
+             Ts[iSnapshot],Tcs[iSnapshot],_)= res
         SFRwindow = SFRwindow_Myr // self.snapshot_dt_Myr
         SFR_means = np.convolve(SFRs,np.ones(SFRwindow)/SFRwindow,mode='same')
         

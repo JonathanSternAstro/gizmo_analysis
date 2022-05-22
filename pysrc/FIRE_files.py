@@ -246,7 +246,11 @@ class Snapshot:
                                                              #arr.shape[0],sim.f['Header'].attrs['NumPart_Total'][int(particle[-1])]))
             if pr: print('finished loading arrays in %d seconds'%(time.time()-t_start))           
     def masses(self,iPartType=0): #in Msun
-        return 1e10/self.sim.h*self.dic[('PartType%d'%iPartType,'Masses')]
+        _masses = self.dic[('PartType%d'%iPartType,'Masses')]
+        if len(_masses): _masses *= 1e10/self.sim.h
+        return _masses
+
+
     def coords(self,iPartType=0): #in kpc
         return self.dic[('PartType%d'%iPartType,'Coordinates')]/self.sim.h*self.sim.a - self.sim.center.value
     def vs(self): # in km/s
