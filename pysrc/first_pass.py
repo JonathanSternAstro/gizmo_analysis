@@ -140,8 +140,8 @@ class KY_snapshot(ff.Snapshot):
     zvec = np.array([0,0,1.])
     def __init__(self,fn,sim,center,pr=True):
         self.sim = sim
-        self.f = h5py.File(fn,'r',pr=pr)
-        self.dic = ff.h5py_dic([self.f])    
+        self.f = h5py.File(fn,'r')
+        self.dic = ff.h5py_dic([self.f],pr=pr)    
         self.iSnapshot = int(fn[-8:-5])
         
         if center is None:
