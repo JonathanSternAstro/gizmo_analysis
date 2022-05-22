@@ -309,11 +309,12 @@ class KY_sim:
         self.dynamicCentering = dynamicCentering
         self.centerOnBlackHole = centerOnBlackHole
         self.analyticGravity = analyticGravity
+        self.pr = pr
         self.snapshots[0] = KY_snapshot(self.fns_dic[0],self,center=None,pr=self.pr) #for calculating center
         self.loadvals = (simname,snapshots_dir,rvir,dynamicCentering,recalc,
                          centerOnBlackHole,origin,Nsnapshots,analyticGravity,Rcirc)
         self.snapshot_dt_Myr = snapshot_dt_Myr
-        self.pr = pr
+        
         #print([('PartType%d'%iPartType, len(self.snapshots[0].masses(iPartType))) for iPartType in range(6)])
         
     def __str__(self):
