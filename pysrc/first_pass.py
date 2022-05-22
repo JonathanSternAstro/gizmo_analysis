@@ -138,9 +138,9 @@ class PowerLawPotential:
     
 class KY_snapshot(ff.Snapshot):    
     zvec = np.array([0,0,1.])
-    def __init__(self,fn,sim,center):
+    def __init__(self,fn,sim,center,pr=True):
         self.sim = sim
-        self.f = h5py.File(fn,'r')
+        self.f = h5py.File(fn,'r',pr=pr)
         self.dic = ff.h5py_dic([self.f])    
         self.iSnapshot = int(fn[-8:-5])
         
@@ -294,7 +294,7 @@ class KY_sim:
     sub_halo_centers = sub_halo_rvirs = sub_halo_gasMasses = None
     def __init__(self,simname,snapshots_dir,rvir=100*un.kpc,dynamicCentering=False,recalc=False,
                  centerOnBlackHole=False,origin=([1500,1500,1500]),Nsnapshots=None,analyticGravity=None,
-                 Rcirc=None,snapshot_dt_Myr=25):              
+                 Rcirc=None,snapshot_dt_Myr=25,pr=True):              
         self.rvir = rvir #meaningless, used for defining bins in units of rvir
         self.Rcirc = Rcirc
         self.origin = origin
@@ -309,10 +309,11 @@ class KY_sim:
         self.dynamicCentering = dynamicCentering
         self.centerOnBlackHole = centerOnBlackHole
         self.analyticGravity = analyticGravity
-        self.snapshots[0] = KY_snapshot(self.fns_dic[0],self,center=None) #for calculating center
+        self.snapshots[0] = KY_snapshot(self.fns_dic[0],self,center=None,pr=self.pr) #for calculating center
         self.loadvals = (simname,snapshots_dir,rvir,dynamicCentering,recalc,
                          centerOnBlackHole,origin,Nsnapshots,analyticGravity,Rcirc)
         self.snapshot_dt_Myr = snapshot_dt_Myr
+        self.pr = pr
         #print([('PartType%d'%iPartType, len(self.snapshots[0].masses(iPartType))) for iPartType in range(6)])
         
     def __str__(self):
@@ -324,9 +325,9 @@ class KY_sim:
     def getSnapshot(self,iSnapshot):
         if self.snapshots[iSnapshot]==None:
             if self.dynamicCentering:
-                self.snapshots[iSnapshot] = KY_snapshot(self.fns_dic[iSnapshot],self,center=None)
+                self.snapshots[iSnapshot] = KY_snapshot(self.fns_dic[iSnapshot],self,center=None,pr=self.pr)
             else:
-                self.snapshots[iSnapshot] = KY_snapshot(self.fns_dic[iSnapshot],self,center=self.snapshots[0].center)
+                self.snapshots[iSnapshot] = KY_snapshot(self.fns_dic[iSnapshot],self,center=self.snapshots[0].center,pr=self.pr)
         return self.snapshots[iSnapshot]
     def getProfiler(self,iSnapshot):
         if self.profiles[iSnapshot]==None:

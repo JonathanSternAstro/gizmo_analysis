@@ -1006,10 +1006,11 @@ class Snapshot_profiler:
         
         
 class Simulation:
-    def __init__(self,galaxyname,simgroup,resolution,minMass01Rvir=None,profiles=None,dummy=False,Rcirc2Rvir=0.1):
+    def __init__(self,galaxyname,simgroup,resolution,minMass01Rvir=None,profiles=None,dummy=False,Rcirc2Rvir=0.1,pr=True):
         self.galaxyname = galaxyname
         self.simgroup = simgroup
         self.resolution = resolution
+        self.pr = pr
         if not dummy: #just for zs0
             if profiles==None:        
                 all_profiles = [Snapshot_profiler((self.galaxyname, self.simgroup, self.resolution, z),
