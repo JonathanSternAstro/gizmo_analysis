@@ -192,10 +192,11 @@ class Snapshot_meta:
         
                     
 class h5py_dic:
-    def __init__(self,fs,non_subhalo_inds=None):
+    def __init__(self,fs,non_subhalo_inds=None,pr=True):
         self.dic = {}
         self.fs = fs
         self.non_subhalo_inds = non_subhalo_inds
+        self.pr = pr
     def __getitem__(self,k):
         if type(k)==type((None,)):
             particle,field = k
@@ -211,7 +212,7 @@ class h5py_dic:
             else:
                 arr = []
             self.dic[(particle,field)] = arr
-            print('loaded %s, %s'%(particle, field))
+            if self.pr: print('loaded %s, %s'%(particle, field))
         if self.non_subhalo_inds is None:
             return self.dic[(particle,field)]
         else:
