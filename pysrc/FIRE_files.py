@@ -248,14 +248,14 @@ class Snapshot:
             if pr: print('finished loading arrays in %d seconds'%(time.time()-t_start))           
     def masses(self,iPartType=0): #in Msun
         _masses = self.dic[('PartType%d'%iPartType,'Masses')]
-        if len(_masses): _masses *= 1e10/self.sim.h
+        if len(_masses): _masses = _masses * 1e10/self.sim.h
         return _masses
 
 
     def coords(self,iPartType=0): #in kpc
         return self.dic[('PartType%d'%iPartType,'Coordinates')]/self.sim.h*self.sim.a - self.sim.center.value
-    def vs(self): # in km/s
-        return self.dic[('PartType0','Velocities')]*self.sim.a**0.5 - self.sim.centerV.value
+    def vs(self,iPartType=0): # in km/s
+        return self.dic[('PartType%d'%iPartType,'Velocities')]*self.sim.a**0.5 - self.sim.centerV.value
     def E_kin(self):
         return 0.5*(self.vs()**2).sum(axis=1)
     def E_grav(self, rs_Phi, Phi):
@@ -283,7 +283,14 @@ class Snapshot:
         return self.dic[('PartType4','StellarFormationTime')][:]
     def Ts(self): # in K
         epsilon = self.dic[('PartType0','InternalEnergy')][:] #energy per unit mass
-        return (un.km**2/un.s**2 * cons.m_p / cons.k_B).to('K').value * (2./3* mu) * epsilon 
+        return (un.km**2/un.s**2 * cons.m_p / cons.k_B).to('K').value * (2./3* self.mus()) * epsilon 
+    def mus(self):
+        return (1 + 4*self.y_heliums()) / (1+self.y_heliums()+self.ne2nHs()) 
+    def y_heliums(self):
+        Y = self.dic[('PartType0','Metallicity')][:,1]
+        return Y / (4*(1-Y))
+    def ne2nHs(self):
+        return self.dic[('PartType0','ElectronAbundance')][:]
     def log_Ts(self):
         return log(self.Ts())
     def t_cool(self):
@@ -293,7 +300,7 @@ class Snapshot:
                 3.5*self.Ts() / (self.nHs()*LAMBDA))
     def rad_per_unit_volume(self):
         Lambda = LambdaFunc(self.sim.z)
-        nHs = self.nHs() * self.nHs()<0.1
+        nHs = self.nHs() * (self.nHs()<0.1)
         LAMBDA = Lambda(self.Ts(),self.nHs(),self.Z2Zsuns())
         return self.nHs()**2*LAMBDA
     def rad_per_unit_volume_max_nH(self): #bug fix after Paper III
@@ -316,7 +323,9 @@ class Snapshot:
     def cos_theta(self,z_vec):
         z_vec = z_vec / np.linalg.norm(z_vec)
         normed_coords = (self.coords().T / np.linalg.norm(self.coords(),axis=1)).T
-        return np.dot(normed_coords,z_vec)    
+        return np.dot(normed_coords,z_vec)  
+    def sin_theta(self,z_vec):
+        return (1-self.cos_theta(z_vec)**2)**0.5  
     def r2rvirs(self,iPartType=0):
         return self.rs(iPartType) / self.sim.rvir.value    
     def vrs(self):
@@ -339,7 +348,7 @@ class Snapshot:
         js = self.js()
         z_vec /= np.linalg.norm(z_vec)
         j_z = (z_vec[0]*js[:,0] + z_vec[1]*js[:,1] + z_vec[2]*js[:,2])
-        return j_z / self.rs()        
+        return j_z / (self.rs()*self.sin_theta(z_vec))
     def v_theta(self,z_vec):
         z_vec /= np.linalg.norm(z_vec)
         vs = self.vs()

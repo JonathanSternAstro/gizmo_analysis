@@ -182,15 +182,16 @@ class KY_snapshot(ff.Snapshot):
         return self.f['Header'].attrs['Time']
     def number_of_particles(self):
         return self.f['Header'].attrs['NumPart_ThisFile']
-    def vs(self): # in km/s
-        return self.dic[('PartType0','Velocities')]
+    def vs(self,iPartType=0): # in km/s
+        return self.dic[('PartType%d'%iPartType,'Velocities')]
     def v_phi(self,zvec=None):
         if zvec is None: zvec=self.zvec
         return ff.Snapshot.v_phi(self,zvec)
     def v_theta(self,zvec=None):
         if zvec is None: zvec=self.zvec
         return ff.Snapshot.v_theta(self,zvec)
-    def cos_theta(self):
+    def cos_theta(self,zvec=None):
+        if zvec is None: zvec=self.zvec
         return ff.Snapshot.cos_theta(self,self.zvec)
     def phi(self,iPartType=0):
         return np.arctan2(self.coords(iPartType=iPartType)[:,1],self.coords(iPartType=iPartType)[:,0])
