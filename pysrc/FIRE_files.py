@@ -248,7 +248,7 @@ class Snapshot:
             if pr: print('finished loading arrays in %d seconds'%(time.time()-t_start))           
     def masses(self,iPartType=0): #in Msun
         _masses = self.dic[('PartType%d'%iPartType,'Masses')]
-        if len(_masses): _masses *= 1e10/self.sim.h
+        if len(_masses): _masses = _masses * 1e10/self.sim.h
         return _masses
 
 
