@@ -5,14 +5,19 @@ if 'ysz5546' in homedir:
     basedir = homedir+'github_repositories/gizmo_analysis/'
     projectdir = '/projects/b1026/jonathan/KY_sims/'
     simdir = project_workdir = projectdir+'sim_outputs/'
+    profiledir = projectdir + 'radialProfiles/'
+elif homedir=='/mnt/home/jstern/': #rusty
+    basedir = homedir+'gizmo_analysis/'
+    projectdir = homedir+'ceph/'
+    profiledir = projectdir+'sim_analysis/radial_profiles/'
+    simdir = project_workdir = homedir+'/data/'
 else:
     basedir = homedir+'fire_analysis/'
     projectdir = basedir
     simdir = project_workdir = homedir+'/data/'
+    profiledir = projectdir + 'radialProfiles/'
 
 tables_dir=basedir+'CoolingTables/'
-
-profiledir = projectdir + 'radialProfiles/'
 figdir = projectdir+'figures/'
 moviedir = projectdir+'figures/movieFrames/'
 projectionsdir = projectdir+'projections/'

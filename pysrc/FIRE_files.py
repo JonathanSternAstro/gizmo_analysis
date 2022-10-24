@@ -6,13 +6,19 @@ if 'jonathan/' in homedir:
 elif 'jovyan' in homedir:
     basedir = homedir+'fire_analysis/'
     tables_dir=basedir+'CoolingTables/'
+elif homedir=='/mnt/home/jstern/': #rusty
+    basedir = homedir+'gizmo_analysis/'
+    tables_dir=basedir+'CoolingTables/'
 else:
     basedir = homedir+'jonathanmain/CGM/rapidCoolingCGM/'
     tables_dir=basedir+'../data/CoolingTables/'
+
 if 'tg839127' in homedir:
     pyobjDir = '/work/04613/tg839127/simulation_data/FIRE/no_yt/'
 elif 'ysz5546' in homedir:
     pyobjDir = '/projects/b1026/jonathan/analysis_pyobjs/no_yt/'
+elif homedir=='/mnt/home/jstern/': #rusty
+    pyobjDir = homedir+'ceph/radial_profiles/'
 else:
     pyobjDir = basedir+'pyobj/no_yt_analysis/'
 figDir = basedir+'figures/'
@@ -256,6 +262,12 @@ class Snapshot:
         return self.dic[('PartType%d'%iPartType,'Coordinates')]/self.sim.h*self.sim.a - self.sim.center.value
     def vs(self,iPartType=0): # in km/s
         return self.dic[('PartType%d'%iPartType,'Velocities')]*self.sim.a**0.5 - self.sim.centerV.value
+    def vx(self,iPartType=0): # in km/s
+        return self.vs(iPartType)[:,0]
+    def vy(self,iPartType=0): # in km/s
+        return self.vs(iPartType)[:,1]
+    def vz(self,iPartType=0): # in km/s
+        return self.vs(iPartType)[:,2]
     def E_kin(self):
         return 0.5*(self.vs()**2).sum(axis=1)
     def E_grav(self, rs_Phi, Phi):
@@ -353,8 +365,9 @@ class Snapshot:
         z_vec /= np.linalg.norm(z_vec)
         vs = self.vs()
         v_z = vs[:,0] * z_vec[0] + vs[:,1] * z_vec[1] + vs[:,2] * z_vec[2]        
-        abs_v_theta = ((self.vs()**2).sum(axis=1) - self.v_phi(z_vec)**2 - self.vrs()**2)**0.5
-        return -np.sign(v_z) * abs_v_theta
+        vtheta2 = (self.vs()**2).sum(axis=1) - self.v_phi(z_vec)**2 - self.vrs()**2
+        vtheta2 *= vtheta2>0 #avoid nans
+        return -np.sign(v_z) * vtheta2**0.5
     def Js(self): 
         vs = self.vs() 
         coords = self.coords() 
@@ -706,6 +719,8 @@ class Snapshot_profiler:
         LAMBDA = Lambda(T,nH,self.Z2Zsun())
         tcools = (cons.k_B*un.K/(un.erg/un.s)).to('Myr').value * coeff*T / (nH*LAMBDA)       
         return tcools
+    def t_flow(self):
+        return self.rs_midbins() / -self.profile1D('vrs','MW') * (un.kpc/(un.km/un.s)).to('Myr')    
     def Z2Zsun(self):
         return self.thickerShells(self.profile1D('Z2Zsuns','MW'),d=5,weighting='MW')
     def thickerShells(self,arr,d,weighting):
@@ -1013,6 +1028,9 @@ class Snapshot_profiler:
         Ps = dPs[::-1].cumsum()[::-1]
         return Ps * (un.g*un.cm**-3*un.km**2/un.s**2/cons.k_B).to('cm**-3*K').value
         
+    def sigma_turb(self,weight='MW'):
+        tmp=np.array([self.profile1D('v%s'%d,weight,power=2) - self.profile1D('v%s'%d,weight)**2 for d in ('rs','_phi','_theta')])
+        return (tmp.sum(axis=0)/3.)**0.5
         
 class Simulation:
     def __init__(self,galaxyname,simgroup,resolution,minMass01Rvir=None,profiles=None,dummy=False,Rcirc2Rvir=0.1,pr=True):
