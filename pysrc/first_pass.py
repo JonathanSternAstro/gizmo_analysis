@@ -1,27 +1,5 @@
 import sys, os, subprocess, multiprocessing, traceback
-homedir = os.getenv("HOME")+'/'
-
-if 'ysz5546' in homedir:
-    basedir = homedir+'github_repositories/gizmo_analysis/'
-    projectdir = '/projects/b1026/jonathan/KY_sims/'
-    simdir = project_workdir = projectdir+'sim_outputs/'
-    profiledir = projectdir + 'radialProfiles/'
-elif homedir=='/mnt/home/jstern/': #rusty
-    basedir = homedir+'gizmo_analysis/'
-    projectdir = homedir+'ceph/'
-    profiledir = projectdir+'sim_analysis/radial_profiles/'
-    simdir = project_workdir = homedir+'/data/'
-else:
-    basedir = homedir+'fire_analysis/'
-    projectdir = basedir
-    simdir = project_workdir = homedir+'/data/'
-    profiledir = projectdir + 'radialProfiles/'
-
-tables_dir=basedir+'CoolingTables/'
-figdir = projectdir+'figures/'
-moviedir = projectdir+'figures/movieFrames/'
-projectionsdir = projectdir+'projections/'
-
+from workdirs import *
 import FIRE_files as ff
 from FIRE_files import cosmo, u
 import time, importlib
@@ -33,7 +11,7 @@ import h5py
 import scipy, scipy.stats
 from matplotlib import ticker
 
-sys.path.append('../FIRE_studio/')
+sys.path.append(basedir+'FIRE_studio/')
 import abg_python
 import abg_python.snapshot_utils
 import firestudio

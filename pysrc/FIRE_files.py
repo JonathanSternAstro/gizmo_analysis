@@ -1,29 +1,5 @@
 import h5py, numpy as np, glob, string, os, pdb, time
-homedir = os.getenv("HOME")+'/'
-if 'jonathan/' in homedir:
-    basedir = homedir+'Dropbox/jonathanmain/CGM/rapidCoolingCGM/'
-    tables_dir=basedir+'../data/CoolingTables/'
-elif 'jovyan' in homedir:
-    basedir = homedir+'fire_analysis/'
-    tables_dir=basedir+'CoolingTables/'
-elif homedir=='/mnt/home/jstern/': #rusty
-    basedir = homedir+'gizmo_analysis/'
-    tables_dir=basedir+'CoolingTables/'
-else:
-    basedir = homedir+'jonathanmain/CGM/rapidCoolingCGM/'
-    tables_dir=basedir+'../data/CoolingTables/'
-
-if 'tg839127' in homedir:
-    pyobjDir = '/work/04613/tg839127/simulation_data/FIRE/no_yt/'
-elif 'ysz5546' in homedir:
-    pyobjDir = '/projects/b1026/jonathan/analysis_pyobjs/no_yt/'
-elif homedir=='/mnt/home/jstern/': #rusty
-    pyobjDir = homedir+'ceph/radial_profiles/'
-else:
-    pyobjDir = basedir+'pyobj/no_yt_analysis/'
-figDir = basedir+'figures/'
-pyobjDir2 = basedir+'pyobjs/'
-Mstardir = basedir+'data/Mstars/'
+from workdirs import *
 
 import os
 from numpy import log10 as log
@@ -328,6 +304,8 @@ class Snapshot:
         return self.nHs() * self.Ts()
     def log_nHTs(self):
         return log(self.nHTs())
+    def log_nHs(self):
+        return log(self.nHs())
     def Ks(self): # in keV cm^2
         return (cons.k_B*un.K/(ne2nH*un.cm**-3)**(2/3.)).to('keV*cm**2').value * self.Ts()/self.nHs()**(2/3.)        
     def rs(self,iPartType=0):
@@ -1031,7 +1009,8 @@ class Snapshot_profiler:
     def sigma_turb(self,weight='MW'):
         tmp=np.array([self.profile1D('v%s'%d,weight,power=2) - self.profile1D('v%s'%d,weight)**2 for d in ('rs','_phi','_theta')])
         return (tmp.sum(axis=0)/3.)**0.5
-        
+    def sigma_log_rho(self,weight='MW'):
+        return (self.profile1D('log_nHs',weight,power=2) - self.profile1D('log_nHs',weight)**2)**0.5        
 class Simulation:
     def __init__(self,galaxyname,simgroup,resolution,minMass01Rvir=None,profiles=None,dummy=False,Rcirc2Rvir=0.1,pr=True):
         self.galaxyname = galaxyname
