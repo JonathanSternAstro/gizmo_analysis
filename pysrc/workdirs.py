@@ -1,7 +1,7 @@
 import sys, os
 homedir = os.getenv("HOME")+'/'
 
-if 'ysz5546' in homedir:
+if 'ysz5546' in homedir: #quest
     basedir = homedir+'github_repositories/gizmo_analysis/'
     projectdir = '/projects/b1026/jonathan/KY_sims/'
     simdir = project_workdir = projectdir+'sim_outputs/'
@@ -11,9 +11,10 @@ elif homedir=='/mnt/home/jstern/': #rusty
     basedir = homedir+'gizmo_analysis/'
     projectdir = homedir+'ceph/'
     profiledir = projectdir+'sim_analysis/radial_profiles/'
-    simdir = project_workdir = homedir+'/data/'
+    tracksdir = projectdir+'sim_analysis/particle_tracks/'
+    simdir = project_workdir = homedir+'Drummond_data/'
     pyobjDir = homedir+'ceph/radial_profiles/'
-elif 'jovyan' in homedir:
+elif 'jovyan' in homedir: # binder
     basedir = homedir+'fire_analysis/'
     projectdir = basedir
     simdir = project_workdir = homedir+'/data/'
