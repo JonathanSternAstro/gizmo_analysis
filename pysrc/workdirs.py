@@ -19,6 +19,14 @@ elif 'jovyan' in homedir: # binder
     projectdir = basedir
     simdir = project_workdir = homedir+'/data/'
     profiledir = projectdir + 'radialProfiles/'
+elif homedir=='/Users/jonathanstern/':
+    basedir = homedir+'Dropbox/github_repositories/gizmo_analysis/'
+    projectdir = basedir+'ipynb/subsonic_solution/pyobjs/'
+    profiledir = projectdir
+    tracksdir = projectdir
+    simdir = '' 
+    #pyobjDir = homedir+'ceph/radial_profiles/'
+    
 
 tables_dir=basedir+'CoolingTables/'
 figDir = figdir = projectdir+'figures/'
