@@ -33,9 +33,12 @@ figdir = wd.basedir+'figures/'
 sys.path = [x for x in sys.path if 'python2' not in x]
 print(sys.argv)
 simname = sys.argv[1] #e.g. 'vc200_Rs0_Mdot4847_Rcirc10_fgas02_res1e4_n10_NoLowCool_tracking'
-Nsnapshots,dt,rmax = map(int, sys.argv[2].split('_')) # e.g. '225_10_40'
+track_length_in_10Myr,dt,rmax = map(int, sys.argv[2].split('_')) # e.g. '225_10_40'
 lastSnapshot = int(sys.argv[3]) #e.g. '325' -- recieved by automatic script which runs over last snapshots number
-
+Nsnapshots = track_length_in_10Myr // (dt//10)
+if lastSnapshot<Nsnapshots:
+    print('not enough snapshots',file=sys.stderr)
+    exit()
 CF_path = '/mnt/home/jstern/cooling_flow/pysrc'
 sys.path.append(CF_path)
 import cooling_flow as CF, HaloPotential as Halo
@@ -47,9 +50,12 @@ import cooling_flow as CF, HaloPotential as Halo
 vc = 200. *un.km/un.s
 Rcirc = 10.*un.kpc
 simdir = wd.simdir+'/%s/output/'%simname
-if not os.path.isdir(simdir): os.mkdir(simdir) 
-npz_fn = wd.tracksdir+simname+'/particle_tracks_%s_%s.npz'%(sys.argv[2],sys.argv[3])
-
+outputdir = wd.tracksdir+simname
+if not os.path.isdir(outputdir): os.mkdir(outputdir) 
+npz_fn = outputdir+'/particle_tracks_%s_%s.npz'%(sys.argv[2],sys.argv[3])
+if os.path.exists(npz_fn):
+    print('file already calculated!',file=sys.stderr)
+    exit()
 
 # In[5]:
 
@@ -98,7 +104,7 @@ accreted_IDs = tmp[inds1][accreted_inds]
 # In[11]:
 
 
-print(len(accreted_IDs.nonzero()[0]))
+print("number of accreted particles: %d"%len(accreted_IDs.nonzero()[0]))
 accreted_inds_dic = [None] * len(qs)
 for iq,q in enumerate(qs):
     tmp = np.concatenate([q,ps[iq]])
