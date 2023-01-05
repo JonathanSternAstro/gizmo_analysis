@@ -36,7 +36,7 @@ simname = sys.argv[1] #e.g. 'vc200_Rs0_Mdot4847_Rcirc10_fgas02_res1e4_n10_NoLowC
 track_length_in_10Myr,dt,rmax = map(int, sys.argv[2].split('_')) # e.g. '225_10_40'
 lastSnapshot = int(sys.argv[3]) #e.g. '325' -- recieved by automatic script which runs over last snapshots number
 Nsnapshots = track_length_in_10Myr // (dt//10)
-if lastSnapshot<Nsnapshots:
+if lastSnapshot<Nsnapshots-1:
     print('not enough snapshots',file=sys.stderr)
     exit()
 CF_path = '/mnt/home/jstern/cooling_flow/pysrc'
