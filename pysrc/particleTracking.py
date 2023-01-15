@@ -33,10 +33,10 @@ figdir = wd.basedir+'figures/'
 sys.path = [x for x in sys.path if 'python2' not in x]
 print(sys.argv)
 simname = sys.argv[1] #e.g. 'vc200_Rs0_Mdot4847_Rcirc10_fgas02_res1e4_n10_NoLowCool_tracking'
-track_length_in_10Myr,dt,rmax = map(int, sys.argv[2].split('_')) # e.g. '225_10_40'
+track_length,dt,rmax,vc,Rcirc,subsample = map(int, sys.argv[2].split('_')) # e.g. '2250_10_40_200_15_100'
 lastSnapshot = int(sys.argv[3]) #e.g. '325' -- recieved by automatic script which runs over last snapshots number
-Nsnapshots = track_length_in_10Myr // (dt//10)
-if lastSnapshot<Nsnapshots:
+Nsnapshots = track_length // dt
+if lastSnapshot<Nsnapshots-1:
     print('not enough snapshots',file=sys.stderr)
     exit()
 CF_path = '/mnt/home/jstern/cooling_flow/pysrc'
@@ -47,8 +47,8 @@ import cooling_flow as CF, HaloPotential as Halo
 # In[4]:
 
 
-vc = 200. *un.km/un.s
-Rcirc = 10.*un.kpc
+vc = vc*un.km/un.s
+Rcirc = Rcirc*un.kpc
 simdir = wd.simdir+'/%s/output/'%simname
 outputdir = wd.tracksdir+simname
 if not os.path.isdir(outputdir): os.mkdir(outputdir) 
@@ -98,7 +98,7 @@ ps = [snapshot.dic[('PartType4','ParticleIDs')] for snapshot in snapshots]
 tmp = np.concatenate([qs[0],ps[0]]) 
 _,inds1,inds2 = np.intersect1d(tmp,qs[-1],assume_unique=True,return_indices=True)
 accreted_inds = ((snapshots[-1].rs()<(rmax+1)) & (snapshots[-1].rs()>rmax))[inds2]
-accreted_IDs = tmp[inds1][accreted_inds]
+accreted_IDs = tmp[inds1][accreted_inds][::subsample]
 
 
 # In[11]:
