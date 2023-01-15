@@ -77,68 +77,40 @@ print(sim.galaxyname, sim.Nsnapshots())
 
 snapshots = [sim.getSnapshot(i) for i in snapNumbers][::-1]
 
-
-# In[8]:
-
-
-qs = [snapshot.dic[('PartType0','ParticleIDs')] for snapshot in snapshots]
-
-
-# In[9]:
-
-
-ps = [snapshot.dic[('PartType4','ParticleIDs')] for snapshot in snapshots]
-
-
-
-# In[10]:
-
-
-# select by location in CGM
-tmp = np.concatenate([qs[0],ps[0]]) 
-_,inds1,inds2 = np.intersect1d(tmp,qs[-1],assume_unique=True,return_indices=True)
+q_last = snapshots[0].dic[('PartType0','ParticleIDs')] 
+q_first = snapshots[-1].dic[('PartType0','ParticleIDs')] 
+p_last = snapshots[0].dic[('PartType4','ParticleIDs')] 
+tmp = np.concatenate([q_last,p_last]) 
+_,inds1,inds2 = np.intersect1d(tmp,q_first,assume_unique=True,return_indices=True)
 accreted_inds = ((snapshots[-1].rs()<(rmax+1)) & (snapshots[-1].rs()>rmax))[inds2]
 accreted_IDs = tmp[inds1][accreted_inds][::subsample]
 
+N_particles = len(accreted_IDs.nonzero()[0])
+print("number of tracked particles: %d"%N_particles)
 
-# In[11]:
+coords = np.zeros((len(snapshots),N_particles,3))
+vs = np.zeros((len(snapshots),N_particles,3))
+Ts = np.zeros((len(snapshots),N_particles))
+nHs = np.zeros((len(snapshots),N_particles))
+tcools = np.zeros((len(snapshots),N_particles))
 
-
-print("number of accreted particles: %d"%len(accreted_IDs.nonzero()[0]))
-accreted_inds_dic = [None] * len(qs)
-for iq,q in enumerate(qs):
-    tmp = np.concatenate([q,ps[iq]])
+for iq in range(len(snaphots)):
+    q = snapshots[iq].dic[('PartType0','ParticleIDs')] 
+    p = snapshots[iq].dic[('PartType4','ParticleIDs')] 
+    tmp = np.concatenate([q,p])
     _,_,indices = np.intersect1d(accreted_IDs,tmp,assume_unique=True,return_indices=True)
-    accreted_inds_dic[iq] = indices
-
-
-# In[12]:
-
-
-concat  = lambda snap,attr: np.concatenate([getattr(snap,attr)(a) for a in (0,4)])
-def concat2(snap,attr,l): 
-    vals = getattr(snap,attr)()
-    if l == 0: return vals
-    return np.concatenate([vals, np.nan*np.ones(l)])
-
-
-# In[25]:
-
-
-coords = np.array([concat(snapshots[i],'coords')[accreted_inds_dic[i],:]       for i in range(len(snapshots))])
-print("finished coords")
-vs     = np.array([concat(snapshots[i],'vs')[accreted_inds_dic[i],:]           for i in range(len(snapshots))])
-print("finished vs")
-Ts     = np.array([concat2(snapshots[i],'Ts',len(ps[i]))[accreted_inds_dic[i]]  for i in range(len(snapshots))])
-print("finished Ts")
-nHs    = np.array([concat2(snapshots[i],'nHs',len(ps[i]))[accreted_inds_dic[i]] for i in range(len(snapshots))])
-print("finished nHs")
-tcools = np.array([concat2(snapshots[i],'t_cool',len(ps[i]))[accreted_inds_dic[i]]       for i in range(len(snapshots))])
-print("finished tcools")
-
-
-# In[20]:
-
+    coords[iq,:,:] = np.concatenate([snapshots[i].coords(0),snapshots[i].coords(4)])[indices,:]       ])
+    vs[iq,:,:]     = np.concatenate([snapshots[i].vs(0),snapshots[i].vs(4)])[indices,:]
+    if len(p)==0:
+        Ts[iq,:] = snapshots[i].Ts()[indices]
+        nHs[iq,:] = snapshots[i].nHs()[indices]
+        tcools[iq,:] = snapshots[i].t_cool()[indices]
+    else:
+        l = len(p)
+        Ts[iq,:] = np.concatenate([snapshots[i].Ts(), np.nan*np.ones(l)])[indices]
+        nHs[iq,:] = np.concatenate([snapshots[i].nHs(), np.nan*np.ones(l)])[indices]
+        tcools[iq,:] = np.concatenate([snapshots[i].t_cool(), np.nan*np.ones(l)])[indices]
+        
 
 np.savez(npz_fn,coords=coords,vs=vs,Ts=Ts,nHs=nHs,tcools=tcools)
 print("saved %s"%npz_fn)
