@@ -94,22 +94,23 @@ Ts = np.zeros((len(snapshots),N_particles))
 nHs = np.zeros((len(snapshots),N_particles))
 tcools = np.zeros((len(snapshots),N_particles))
 
-for iq in range(len(snaphots)):
+for iq in range(len(snapshots)):
+    print(iq)
     q = snapshots[iq].dic[('PartType0','ParticleIDs')] 
     p = snapshots[iq].dic[('PartType4','ParticleIDs')] 
     tmp = np.concatenate([q,p])
     _,_,indices = np.intersect1d(accreted_IDs,tmp,assume_unique=True,return_indices=True)
-    coords[iq,:,:] = np.concatenate([snapshots[i].coords(0),snapshots[i].coords(4)])[indices,:]       ])
-    vs[iq,:,:]     = np.concatenate([snapshots[i].vs(0),snapshots[i].vs(4)])[indices,:]
+    coords[iq,:,:] = np.concatenate([snapshots[iq].coords(0),snapshots[iq].coords(4)])[indices,:]
+    vs[iq,:,:]     = np.concatenate([snapshots[iq].vs(0),snapshots[iq].vs(4)])[indices,:]
     if len(p)==0:
-        Ts[iq,:] = snapshots[i].Ts()[indices]
-        nHs[iq,:] = snapshots[i].nHs()[indices]
-        tcools[iq,:] = snapshots[i].t_cool()[indices]
+        Ts[iq,:] = snapshots[iq].Ts()[indices]
+        nHs[iq,:] = snapshots[iq].nHs()[indices]
+        tcools[iq,:] = snapshots[iq].t_cool()[indices]
     else:
         l = len(p)
-        Ts[iq,:] = np.concatenate([snapshots[i].Ts(), np.nan*np.ones(l)])[indices]
-        nHs[iq,:] = np.concatenate([snapshots[i].nHs(), np.nan*np.ones(l)])[indices]
-        tcools[iq,:] = np.concatenate([snapshots[i].t_cool(), np.nan*np.ones(l)])[indices]
+        Ts[iq,:] = np.concatenate([snapshots[iq].Ts(), np.nan*np.ones(l)])[indices]
+        nHs[iq,:] = np.concatenate([snapshots[iq].nHs(), np.nan*np.ones(l)])[indices]
+        tcools[iq,:] = np.concatenate([snapshots[iq].t_cool(), np.nan*np.ones(l)])[indices]
         
 
 np.savez(npz_fn,coords=coords,vs=vs,Ts=Ts,nHs=nHs,tcools=tcools)
