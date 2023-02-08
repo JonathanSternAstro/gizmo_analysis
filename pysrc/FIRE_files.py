@@ -632,7 +632,6 @@ class Snapshot_profiler:
     def massProfile(self,iPartTypes = (0,1,2,4),minT=None):
         total_mass = np.zeros(self.log_r2rvir_bins.shape[0]-1)
         for iPartType in iPartTypes:     
-            if len(self.snapshot.dic[('PartType%d'%iPartType,'Masses')])==0: continue
             if minT==None or iPartType!=0:
                 save_name = 'massProfile%d'%iPartType
                 inds = Ellipsis
@@ -640,6 +639,7 @@ class Snapshot_profiler:
                 save_name = 'massProfile%d_minT'%iPartType
                 inds = self.snapshot.Ts()>minT
             if not self.isSaved(save_name):
+                if len(self.snapshot.dic[('PartType%d'%iPartType,'Masses')])==0: continue
                 hist,_,_ = scipy.stats.binned_statistic(log(self.snapshot.r2rvirs(iPartType)[inds]),
                                                             self.snapshot.masses(iPartType)[inds],
                                                             statistic='sum',
