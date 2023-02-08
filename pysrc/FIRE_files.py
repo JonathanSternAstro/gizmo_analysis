@@ -845,13 +845,15 @@ class Snapshot_profiler:
     def delta(self):
         return self.rhoProfile() /(cosmo.Ob(self.z)*cosmo.critical_density(self.z).to('g*cm**-3').value)
     
-    def profile1D_multiple(self,attrs,weight,power=1,minT=None,maxT=None,lazy=True,*args,**kwargs): 
+    def profile1D_multiple(self,attrs,weight,power=1,minT=None,maxT=None,max_costheta=None,lazy=True,*args,**kwargs): 
         if minT==None and maxT==None:
             k = lambda attr,weight=weight,power=power: '%s%s_%s'%(attr,('','2')[power==2],weight)
         elif minT!=None:
             k = lambda attr,weight=weight,power=power: '%s%s_%s_minT_%d'%(attr,('','2')[power==2],weight,minT)
         elif maxT!=None:
             k = lambda attr,weight=weight,power=power: '%s%s_%s_maxT_%d'%(attr,('','2')[power==2],weight,maxT)
+        elif max_costheta!=None:
+            k = lambda attr,weight=weight,power=power: '%s%s_%s_max_costheta_%d'%(attr,('','2')[power==2],weight,max_costheta)
         new_attrs = [attr for attr in attrs if (not lazy) or (not self.isSaved(k(attr)))]
         if len(new_attrs):
             if weight=='VW': weightvals = self.snapshot.volume()
@@ -864,6 +866,8 @@ class Snapshot_profiler:
                 weightvals *= self.snapshot.Ts()>minT
             if maxT!=None:
                 weightvals *= self.snapshot.Ts()<maxT
+            if max_costheta!=None: #limit to disk plane
+                weightvals *= np.abs(self.snapshot.cos_theta()),
             values = [weightvals] + [getattr(self.snapshot,attr)(*args,**kwargs)**power*weightvals for attr in new_attrs]        
             hist,_,_ = scipy.stats.binned_statistic(log(self.snapshot.r2rvirs()),
                                                     values, 
@@ -1006,8 +1010,8 @@ class Snapshot_profiler:
         Ps = dPs[::-1].cumsum()[::-1]
         return Ps * (un.g*un.cm**-3*un.km**2/un.s**2/cons.k_B).to('cm**-3*K').value
         
-    def sigma_turb(self,weight='MW'):
-        tmp=np.array([self.profile1D('v%s'%d,weight,power=2) - self.profile1D('v%s'%d,weight)**2 for d in ('rs','_phi','_theta')])
+    def sigma_turb(self,weight='MW',minT=None):
+        tmp=np.array([self.profile1D('v%s'%d,weight,power=2,minT=minT) - self.profile1D('v%s'%d,weight,minT=minT)**2 for d in ('rs','_phi','_theta')])
         return (tmp.sum(axis=0)/3.)**0.5
     def sigma_log_rho(self,weight='MW'):
         return (self.profile1D('log_nHs',weight,power=2) - self.profile1D('log_nHs',weight)**2)**0.5        
