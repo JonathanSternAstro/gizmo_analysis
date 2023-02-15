@@ -846,14 +846,14 @@ class Snapshot_profiler:
         return self.rhoProfile() /(cosmo.Ob(self.z)*cosmo.critical_density(self.z).to('g*cm**-3').value)
     
     def profile1D_multiple(self,attrs,weight,power=1,minT=None,maxT=None,max_costheta=None,lazy=True,*args,**kwargs): 
-        if minT==None and maxT==None:
+        if minT==None and maxT==None and max_costheta==None:
             k = lambda attr,weight=weight,power=power: '%s%s_%s'%(attr,('','2')[power==2],weight)
         elif minT!=None:
             k = lambda attr,weight=weight,power=power: '%s%s_%s_minT_%d'%(attr,('','2')[power==2],weight,minT)
         elif maxT!=None:
             k = lambda attr,weight=weight,power=power: '%s%s_%s_maxT_%d'%(attr,('','2')[power==2],weight,maxT)
         elif max_costheta!=None:
-            k = lambda attr,weight=weight,power=power: '%s%s_%s_max_costheta_%d'%(attr,('','2')[power==2],weight,max_costheta)
+            k = lambda attr,weight=weight,power=power: '%s%s_%s_max_costheta_%d'%(attr,('','2')[power==2],weight,(100*max_costheta))
         new_attrs = [attr for attr in attrs if (not lazy) or (not self.isSaved(k(attr)))]
         if len(new_attrs):
             if weight=='VW': weightvals = self.snapshot.volume()
@@ -867,7 +867,7 @@ class Snapshot_profiler:
             if maxT!=None:
                 weightvals *= self.snapshot.Ts()<maxT
             if max_costheta!=None: #limit to disk plane
-                weightvals *= np.abs(self.snapshot.cos_theta()),
+                weightvals *= np.abs(self.snapshot.cos_theta())<max_costheta
             values = [weightvals] + [getattr(self.snapshot,attr)(*args,**kwargs)**power*weightvals for attr in new_attrs]        
             hist,_,_ = scipy.stats.binned_statistic(log(self.snapshot.r2rvirs()),
                                                     values, 
@@ -877,8 +877,8 @@ class Snapshot_profiler:
             for iattr,attr in enumerate(new_attrs):
                 self.save(k(attr),normed_hist[iattr])
         return [self.get_saved(k(attr)) for attr in attrs]
-    def profile1D(self,attr,weight,power=1,minT=None,maxT=None,lazy=True,*args,**kwargs):
-        return self.profile1D_multiple([attr], weight,power,minT,maxT,lazy,*args,**kwargs)[0]
+    def profile1D(self,attr,weight,power=1,minT=None,maxT=None,max_costheta=None,lazy=True,*args,**kwargs):
+        return self.profile1D_multiple([attr], weight,power,minT,maxT,max_costheta,lazy,*args,**kwargs)[0]
             
     def profile2D(self,attr,weight,bins,arr=None,*args,**kwargs):
         k = lambda attr,weight=weight: attr+'_2D_%s'%weight
