@@ -847,14 +847,15 @@ class Snapshot_profiler:
     
     def profile1D_multiple(self,attrs,weight,power=1,minT=None,maxT=None,
                            costheta=None,lazy=True,*args,**kwargs): 
-        if minT==None and maxT==None:
-            k = lambda attr,weight=weight,power=power: '%s%s_%s'%(attr,('','2')[power==2],weight)
+        if minT!=None and maxT==None:
+            if costheta!=None:
+                k = lambda attr,weight=weight,power=power: '%s%s_%s_costheta_%.2f_%.2f'%(attr,('','2')[power==2],weight,costheta[0],costheta[1])
+            else:
+                k = lambda attr,weight=weight,power=power: '%s%s_%s'%(attr,('','2')[power==2],weight)
         elif minT!=None:
             k = lambda attr,weight=weight,power=power: '%s%s_%s_minT_%d'%(attr,('','2')[power==2],weight,minT)
         elif maxT!=None:
             k = lambda attr,weight=weight,power=power: '%s%s_%s_maxT_%d'%(attr,('','2')[power==2],weight,maxT)
-        elif costheta!=None:
-            k = lambda attr,weight=weight,power=power: '%s%s_%s_costheta_%.2f_%.2f'%(attr,('','2')[power==2],weight,costheta[0],costheta[1])
         new_attrs = [attr for attr in attrs if (not lazy) or (not self.isSaved(k(attr)))]
         if len(new_attrs):
             if weight=='VW': weightvals = self.snapshot.volume()
@@ -879,7 +880,7 @@ class Snapshot_profiler:
                 self.save(k(attr),normed_hist[iattr])
         return [self.get_saved(k(attr)) for attr in attrs]
     def profile1D(self,attr,weight,power=1,minT=None,maxT=None,costheta=None,lazy=True,*args,**kwargs):
-        return self.profile1D_multiple([attr], weight,power,minT,maxT,lazy,*args,**kwargs)[0]
+        return self.profile1D_multiple([attr], weight,power,minT,maxT,costheta,lazy,*args,**kwargs)[0]
             
     def profile2D(self,attr,weight,bins,arr=None,*args,**kwargs):
         k = lambda attr,weight=weight: attr+'_2D_%s'%weight
