@@ -176,6 +176,9 @@ class KY_snapshot(ff.Snapshot):
     def cos_theta(self,zvec=None):
         if zvec is None: zvec=self.zvec
         return ff.Snapshot.cos_theta(self,self.zvec)
+    def abs_cos_theta(self,zvec=None):
+        if zvec is None: zvec=self.zvec
+        return np.abs(ff.Snapshot.cos_theta(self,self.zvec))
     def phi(self,iPartType=0):
         return np.arctan2(self.coords(iPartType=iPartType)[:,1],self.coords(iPartType=iPartType)[:,0])
 def calc_properties_for_time_series(loadvals,iSnapshot,rMdot,rVrot):
