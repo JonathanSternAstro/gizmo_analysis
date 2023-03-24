@@ -314,6 +314,9 @@ class KY_sim:
             else:
                 self.snapshots[iSnapshot] = KY_snapshot(self.fns_dic[iSnapshot],self,center=self.snapshots[0].center,pr=self.pr)
         return self.snapshots[iSnapshot]
+    def delSnapshot(self,iSnapshot):
+        self.snapshots[iSnapshot] = None
+        self.profiles[iSnapshot] = None
     def getProfiler(self,iSnapshot):
         if self.profiles[iSnapshot]==None:
             self.profiles[iSnapshot] = KY_profiler(self.getSnapshot(iSnapshot),Rcirc2Rvir=self.Rcirc/self.rvir,recalc=self.recalc)
