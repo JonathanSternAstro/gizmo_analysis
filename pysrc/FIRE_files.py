@@ -847,7 +847,7 @@ class Snapshot_profiler:
     
     def profile1D_multiple(self,attrs,weight,power=1,minT=None,maxT=None,
                            costheta=None,lazy=True,*args,**kwargs): 
-        if minT!=None and maxT==None:
+        if minT==None and maxT==None:
             if costheta!=None:
                 k = lambda attr,weight=weight,power=power: '%s%s_%s_costheta_%.2f_%.2f'%(attr,('','2')[power==2],weight,costheta[0],costheta[1])
             else:
