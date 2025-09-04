@@ -31,6 +31,11 @@ X = 0.7; He2H = 0.1; Y = 4.*He2H * X
 gamma_FG09_zs = np.arange(7)
 gamma_FG09 = 0.04,0.3,0.65,0.55,0.45,0.35,0.27
 Gamma12 = lambda z: 10.**np.interp(z,gamma_FG09_zs,log(gamma_FG09))
+def alpha_Ha(T4):
+    if 0.1<T4<3:
+        return 1.17e-13 * T4**(-0.942-0.031*ln(T4))*un.cm**3 * un.s**-1
+    else:
+        return 0
 
 def iSnapshot(z,fn=pyobjDir+'snapshot_zs_stampede.npz'):
     zs =np.load(fn)['zs']
@@ -201,15 +206,34 @@ class h5py_dic:
             return self.dic[(particle,field)][self.non_subhalo_inds]
 
         
-            
+class dummySimulation:
+    def __init__(self,mvir,rvir,name,z,simgroup,res):
+        self.mvir = mvir
+        self.rvir = rvir  
+        self.galaxyname = name
+        self.z = z
+        self.h = None
+        self.a = (self.z+1)**-1
+        self.res = res
+        self.simgroup = simgroup
+        self.sub_halo_centers = None
+        self.sub_halo_rvirs = None
+        self.sub_halo_gasMasses = None          
 class Snapshot:
     all_fields = 'Masses','Coordinates','Velocities','InternalEnergy','Metallicity','Density', #'Potential
-    def __init__(self,sim,pr=True,loadAll=True,filter_subhalos=False):
+    def __init__(self,sim=None,pr=True,loadAll=True,filter_subhalos=False,fn=None):
         self.sim = sim
-        self.fn = sim.fn
+        
         self.filter_subhalos = filter_subhalos
-        fs = [sim.f]
-        for ifn in range(1,sim.f['Header'].attrs['NumFilesPerSnapshot']):
+        if fn == None: 
+            fs = [sim.f]
+            self.fn = sim.fn
+        else: 
+            self.fn = fn
+            fs = [h5py.File(self.fn)]  
+            self.sim.h = fs[0]['Header'].attrs['HubbleParam']          
+
+        for ifn in range(1,fs[0]['Header'].attrs['NumFilesPerSnapshot']):
             new_fn = self.fn[:-6] + '%d.hdf5'%ifn
             if pr: print(new_fn)
             fs.append(h5py.File(new_fn))
@@ -308,6 +332,8 @@ class Snapshot:
         return log(self.nHs())
     def Ks(self): # in keV cm^2
         return (cons.k_B*un.K/(ne2nH*un.cm**-3)**(2/3.)).to('keV*cm**2').value * self.Ts()/self.nHs()**(2/3.)        
+    def log_Ks(self):
+        return log(self.Ks())
     def rs(self,iPartType=0):
         return ((self.coords(iPartType)**2).sum(axis=1))**0.5
     def cos_theta(self,z_vec):
@@ -435,10 +461,16 @@ class Snapshot:
         res = func.ev(log(self.nHs()),log(self.Ts()))
         F.close()
         return res
-    
+    def Halpha_emission(self): 
+        n_electrons = self.nHs()*self.ne2nHs()
+        n_protons   = self.nHs() * (1-self.fHIs())
+        alphas      = alpha_Ha(self.Ts()/(1e4*un.K))
+        photon_energy = cons.h*3e18/6564.6*un.s**-1
+        return n_electrons * n_protons * alpha * photon_energy
 def midbins(bins):
     return (bins[1:]+bins[:-1])/2.
 class Snapshot_profiler:
+    useSaved = True
     log_r2rvir_bins = np.arange(-3,0.5,.01)
     mach_bins = np.concatenate([-10.**np.arange(-0.2,2.5,.1)[::-1],np.linspace(-10.**-0.3,10.**-0.3,11),10.**np.arange(-0.2,2.5,.1)])
     vr_bins = np.linspace(-1200,1200,601)
@@ -607,6 +639,7 @@ class Snapshot_profiler:
                             pass
         files.close()
     def isSaved(self,save_name):
+        if not self.useSaved: return False
         if save_name in self._saveDic: return True
         if os.path.exists(self.filename()) and save_name in np.load(self.filename()).files: return True
         return False

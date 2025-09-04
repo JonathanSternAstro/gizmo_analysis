@@ -1,0 +1,45 @@
+#Table 2 
+#${N}_{{\rm{H}}{\rm{I}}}$ Models and Measurements
+#
+#Galaxy	z	flg_C^a	${\lambda }_{C}$ ^b	C_0	$\sigma ({C}_{0})$	C_1	$\sigma ({C}_{1})$	${\lambda }_{\tau }$	$\mathrm{log}{N}_{{\rm{H}}{\rm{I}}}$ ^c	C.L.^d	
+#			(Aring)	(10^-15)		(10^-17)		
+J0910+1014_242_34	0.264	2	[1157.30, 1159.95]	0.64	0.02			[1120.0, 1150.0]	16.58	16.51, 16.62	
+#	cdots	cdots	[1162.68, 1165.80]	cdots	cdots	cdots	cdots	cdots	cdots	cdots	
+J0910+1014_34_46	0.143	0	cdots	cdots	cdots	cdots	cdots	cdots	17.25	16.00, 18.50	
+J0943+0531_106_34	0.228	2	[1127.04, 1132.19]	1.96	0.10			[1090.0, 1119.0]	<16.24	cdots	
+#	cdots	cdots	[1136.35, 1140.84]	cdots	cdots	cdots	cdots	cdots	cdots	cdots	
+J0943+0531_227_19	0.353	3	cdots	2.01				[1120.0, 1150.0]	<16.65	cdots	
+J0950+4831_177_27	0.212	1	[1116.38, 1117.77]	5.71	0.15	-3.02	0.49	[1095.0, 1104.0]	>17.91	cdots	
+#	cdots	cdots	cdots	cdots	cdots	cdots	cdots	cdots	18.20	17.90, 18.50	
+J1009+0713_170_9	0.356	0	cdots	cdots	cdots	cdots	cdots	cdots	18.50	18.00, 19.00	
+J1009+0713_204_17	0.228	0	cdots	cdots	cdots	cdots	cdots	cdots	17.50	16.50, 18.50	
+J1016+4706_274_6	0.252	2	[1161.42, 1164.69]	3.57	0.06			[1115.0, 1130.0]	17.10	17.08, 17.11	
+#	cdots	cdots	[1166.92, 1173.34]	
+#	cdots	cdots	[1176.01, 1184.38]	
+J1016+4706_359_16	0.166	0	cdots	cdots	cdots	cdots	cdots	cdots	17.50	16.50, 18.50	
+J1112+3539_236_14	0.247	0	cdots	cdots	cdots	cdots	cdots	cdots	16.70	15.80, 17.60	
+J1133+0327_110_5	0.237	2	[1163.83, 1167.97]	0.44	0.14			[1110.0, 1120.0]	>17.70	cdots	
+#	cdots	cdots	cdots	cdots	cdots	cdots	cdots	cdots	18.60	18.54, 18.66	
+J1133+0327_164_21	0.154	0	cdots	cdots	cdots	cdots	cdots	cdots	16.90	15.80, 18.00	
+J1157-0022_230_7	0.164	2	[1095.88, 1101.43]	1.45	0.48			[1050.0, 1063.0]	<17.01	cdots	
+#	cdots	cdots	[1118.98, 1130.69]	cdots	cdots	cdots	cdots	cdots	cdots	cdots	
+J1233+4758_94_38	0.222	2	[1130.63, 1131.36]	4.31	0.15			[1106.0, 1111.0]	16.74	16.69, 16.77	
+#	cdots	cdots	[1138.68, 1142.35]	cdots	cdots	cdots	cdots	cdots	cdots	cdots	
+J1241+5721_199_6	0.205	1	[1110.63, 1111.52]	3.71	0.21	-3.76	0.57	[1091.0, 1098.0]	>17.83	cdots	
+#	cdots	cdots	cdots	cdots	cdots	cdots	cdots	cdots	18.15	17.80, 18.50	
+J1322+4645_349_11	0.214	1	[1115.55, 1115.86]	3.24	0.10	-4.69	0.71	[1100.0, 1106.0]	17.14	17.10, 17.16	
+#	cdots	cdots	[1119.25, 1120.45]	cdots	cdots	cdots	cdots	cdots	cdots	cdots	
+#	cdots	cdots	[1122.41, 1124.07]	cdots	cdots	cdots	cdots	cdots	cdots	cdots	
+J1330+2813_289_28	0.192	2	[1102.32, 1109.35]	2.02	0.29			[1070.0, 1086.0]	17.03	16.88, 17.11	
+J1342-0053_157_10	0.227	1	[1131.02, 1132.28]	5.29	0.21	-1.71	0.53	[1105.0, 1117.5]	>18.04	cdots	
+#	cdots	cdots	cdots	cdots	cdots	cdots	cdots	cdots	18.50	18.00, 19.00	
+J1419+4207_132_30	0.179	2	[1094.70, 1099.28]	3.00	0.24			[1045.0, 1074.0]	16.63	16.33, 16.72	
+#	cdots	cdots	[1106.57, 1110.78]	
+J1514+3619_287_14	0.212	0	cdots	cdots	cdots	cdots	cdots	cdots	17.50	16.50, 18.50	
+J1555+3628_88_11	0.189	2	[1100.62, 1105.08]	0.60	0.12			[1057.0, 1083.5]	17.17	16.91, 17.30	
+#	cdots	cdots	[1108.25, 1113.18]	cdots	cdots	cdots	cdots	cdots	cdots		
+#Notes. Units for C_0 and C_1 are erg s^-1 cm^-2 Aring^-1 and erg s^-1 cm^-2 Aring^-2 respecitvely.
+#^a Flag describing the continuum method applied: 0 = Analysis based only on Lyman series lines; 1 = Linear fit; 2 = Constant fit; 3 = Continuum imposed by hand.
+#^b Wavelength interval used to fit the quasar continuum redward of the LL.
+#^c $\mathrm{log}{N}_{{\rm{H}}{\rm{I}}}$ value. If reported as a limit, this corresponds to a one-sided 95% confidence interval. For lower limits, we report a second ${N}_{{\rm{H}}{\rm{I}}}$ value and interval that is bounded at the high end by analysis of the Lyalpha line.
+#^d Confidence interval on $\mathrm{log}{N}_{{\rm{H}}{\rm{I}}}$. If the interval exceeds 0.5 dex, one should assume a uniform prior. Otherwise, the interval covers 68% of an approximately Gaussian prior.

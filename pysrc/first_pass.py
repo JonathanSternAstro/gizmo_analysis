@@ -281,7 +281,7 @@ class KY_sim:
     sub_halo_centers = sub_halo_rvirs = sub_halo_gasMasses = None
     def __init__(self,simname,snapshots_dir,rvir=100*un.kpc,dynamicCentering=False,recalc=False,
                  centerOnBlackHole=False,origin=([1500,1500,1500]),Nsnapshots=None,analyticGravity=None,
-                 Rcirc=None,snapshot_dt_Myr=25,pr=True):              
+                 Rcirc=None,snapshot_dt_Myr=25,pr=True,hasZeroSnapshot=True):              
         self.rvir = rvir #meaningless, used for defining bins in units of rvir
         self.Rcirc = Rcirc
         self.origin = origin
@@ -297,7 +297,8 @@ class KY_sim:
         self.centerOnBlackHole = centerOnBlackHole
         self.analyticGravity = analyticGravity
         self.pr = pr
-        self.snapshots[0] = KY_snapshot(self.fns_dic[0],self,center=None,pr=self.pr) #for calculating center
+        if hasZeroSnapshot:
+            self.snapshots[0] = KY_snapshot(self.fns_dic[0],self,center=None,pr=self.pr) #for calculating center
         self.loadvals = (simname,snapshots_dir,rvir,dynamicCentering,recalc,
                          centerOnBlackHole,origin,Nsnapshots,analyticGravity,Rcirc)
         self.snapshot_dt_Myr = snapshot_dt_Myr
@@ -314,8 +315,10 @@ class KY_sim:
         if self.snapshots[iSnapshot]==None:
             if self.dynamicCentering:
                 self.snapshots[iSnapshot] = KY_snapshot(self.fns_dic[iSnapshot],self,center=None,pr=self.pr)
-            else:
+            elif self.snapshots[0]!=None:
                 self.snapshots[iSnapshot] = KY_snapshot(self.fns_dic[iSnapshot],self,center=self.snapshots[0].center,pr=self.pr)
+            else:
+                self.snapshots[iSnapshot] = KY_snapshot(self.fns_dic[iSnapshot],self,center=None,pr=self.pr)                
         return self.snapshots[iSnapshot]
     def delSnapshot(self,iSnapshot):
         self.snapshots[iSnapshot] = None
