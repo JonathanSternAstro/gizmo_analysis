@@ -33,7 +33,7 @@ gamma_FG09 = 0.04,0.3,0.65,0.55,0.45,0.35,0.27
 Gamma12 = lambda z: 10.**np.interp(z,gamma_FG09_zs,log(gamma_FG09))
 def alpha_Ha(T4):
     if 0.1<T4<3:
-        return 1.17e-13 * T4**(-0.942-0.031*ln(T4))*un.cm**3 * un.s**-1
+        return 1.17e-13 * T4**(-0.942-0.031*ln(T4))
     else:
         return 0
 
@@ -464,9 +464,9 @@ class Snapshot:
     def Halpha_emission(self): 
         n_electrons = self.nHs()*self.ne2nHs()
         n_protons   = self.nHs() * (1-self.fHIs())
-        alphas      = alpha_Ha(self.Ts()/(1e4*un.K))
-        photon_energy = cons.h*3e18/6564.6*un.s**-1
-        return n_electrons * n_protons * alpha * photon_energy
+        alphas      = alpha_Ha(self.Ts()/1e4)
+        photon_energy = cons.h.to('erg s').value*3e18/6564.6 
+        return n_electrons * n_protons * alphas * photon_energy
 def midbins(bins):
     return (bins[1:]+bins[:-1])/2.
 class Snapshot_profiler:
