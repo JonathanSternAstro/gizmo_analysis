@@ -32,7 +32,7 @@ gamma_FG09_zs = np.arange(7)
 gamma_FG09 = 0.04,0.3,0.65,0.55,0.45,0.35,0.27
 Gamma12 = lambda z: 10.**np.interp(z,gamma_FG09_zs,log(gamma_FG09))
 def alpha_Ha(T4):
-    if (0.1<T4) and (T4<3):
+    if (0.1<T4)*(T4<3):
         return 1.17e-13 * T4**(-0.942-0.031*ln(T4))
     else:
         return 0
