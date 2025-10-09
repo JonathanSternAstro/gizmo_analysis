@@ -31,9 +31,15 @@ X = 0.7; He2H = 0.1; Y = 4.*He2H * X
 gamma_FG09_zs = np.arange(7)
 gamma_FG09 = 0.04,0.3,0.65,0.55,0.45,0.35,0.27
 Gamma12 = lambda z: 10.**np.interp(z,gamma_FG09_zs,log(gamma_FG09))
+
+alpha_Ha_fn = '../pyobjs/Ha_recombination_coefficient.npz'
+alpha_Ha_Ts = np.load(alpha_Ha_fn)['Ts']
+alpha_Has = np.load(alpha_Ha_fn)['alphas']
+
 def alpha_Ha(T4):
-    condition = (0.1<T4)*(T4<3)
-    return 1.17e-13 * T4**(-0.942-0.031*ln(T4)) * condition
+    condition = (0.1<T4)*(T4<1e3)
+    #return 1.17e-13 * T4**(-0.942-0.031*ln(T4)) * condition analytic
+    return np.interp(T4,alpha_Ha_Ts/1e4,alpha_Has)
 
 def iSnapshot(z,fn=pyobjDir+'snapshot_zs_stampede.npz'):
     zs =np.load(fn)['zs']
