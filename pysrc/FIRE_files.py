@@ -753,13 +753,15 @@ class Snapshot_profiler:
         return self.massProfile(iPartTypes=(0,),minT=minT)
     def jvec_Profile(self,weight='MW',**kwargs):
         suffix = ('','_%s'%weight)[weight!='MW']
-        if weight=='ion': suffix += '_%s%d'%(element,ionizationLevel+1)
         if not self.isSaved('j_vec_x'+suffix):
             if weight=='MW': weightvals = self.snapshot.masses()
             if weight=='HI': weightvals = self.snapshot.HImasses()
             if weight=='mol': weightvals = self.snapshot.masses() * (self.snapshot.nHs() > 1000.)
             if weight=='SFR': weightvals = self.snapshot.SFRs()
-            if weight=='ion': weightvals = 10.**self.snapshot.ionFractions(element,ionizationLevel) * self.snapshot.masses()                 
+            if weight[:3]=='ion': 
+                element=weight.split('_')[1]
+                ionizationLevel = int(weight.split('_')[2])
+                weightvals = 10.**self.snapshot.ionFractions(element,ionizationLevel) * self.snapshot.masses()                 
             
             js = (self.snapshot.js().T * weightvals).T
             hist,_,_ = scipy.stats.binned_statistic(log(self.snapshot.r2rvirs()),
@@ -805,8 +807,8 @@ class Snapshot_profiler:
         j_vec_x,j_vec_y,j_vec_z = self.jvec_Profile()
         J_scalar = (j_vec_x**2+j_vec_y**2+j_vec_z**2)**0.5
         return J_scalar
-    def jzProfile(self,maxR2Rvir_disk=0.05,weight='MW',**kwargs):
-        j_vec_x,j_vec_y,j_vec_z = self.jvec_Profile(weight,kwargs=kwargs)
+    def jzProfile(self,maxR2Rvir_disk=0.05,weight='MW'):
+        j_vec_x,j_vec_y,j_vec_z = self.jvec_Profile(weight)
         jDisc = self.central_jvec(maxR2Rvir_disk=maxR2Rvir_disk,weight=weight)
         jDisc /= np.linalg.norm(jDisc)
         j_z = (j_vec_x*jDisc[0] + j_vec_y*jDisc[1] + j_vec_z*jDisc[2])
