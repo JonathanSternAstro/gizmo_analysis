@@ -478,7 +478,6 @@ class Snapshot_profiler:
     K_bins = 10.**np.arange(-4,4.,.01)
     J_bins = 10.**np.arange(1.,6.,.01)
     t_cool_bins = 10.**np.arange(-2,7,.01)
-    
     def __init__(self,snapshot,Rcirc2Rvir = 0.1):        
         self.Rcirc2Rvir = Rcirc2Rvir
         self.snapshot = snapshot
@@ -752,13 +751,15 @@ class Snapshot_profiler:
         return np.interp(log(fraction_of_Rvir*self.rvir), log(self.rs_midbins()), arr)        
     def gasMassProfile(self,minT=None):
         return self.massProfile(iPartTypes=(0,),minT=minT)
-    def jvec_Profile(self,weight='MW'):
+    def jvec_Profile(self,weight='MW',**kwargs):
         suffix = ('','_%s'%weight)[weight!='MW']
+        if weight=='ion': suffix += '_%s%d'%(element,ionizationLevel+1)
         if not self.isSaved('j_vec_x'+suffix):
             if weight=='MW': weightvals = self.snapshot.masses()
             if weight=='HI': weightvals = self.snapshot.HImasses()
             if weight=='mol': weightvals = self.snapshot.masses() * (self.snapshot.nHs() > 1000.)
-            if weight=='SFR': weightvals = self.snapshot.SFRs()                 
+            if weight=='SFR': weightvals = self.snapshot.SFRs()
+            if weight=='ion': weightvals = 10.**self.snapshot.ionFractions(element,ionizationLevel) * self.snapshot.masses()                 
             
             js = (self.snapshot.js().T * weightvals).T
             hist,_,_ = scipy.stats.binned_statistic(log(self.snapshot.r2rvirs()),
