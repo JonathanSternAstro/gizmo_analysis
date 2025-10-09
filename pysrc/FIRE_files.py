@@ -805,8 +805,8 @@ class Snapshot_profiler:
         j_vec_x,j_vec_y,j_vec_z = self.jvec_Profile()
         J_scalar = (j_vec_x**2+j_vec_y**2+j_vec_z**2)**0.5
         return J_scalar
-    def jzProfile(self,maxR2Rvir_disk=0.05,weight='MW'):
-        j_vec_x,j_vec_y,j_vec_z = self.jvec_Profile(weight)
+    def jzProfile(self,maxR2Rvir_disk=0.05,weight='MW',**kwargs):
+        j_vec_x,j_vec_y,j_vec_z = self.jvec_Profile(weight,kwargs=kwargs)
         jDisc = self.central_jvec(maxR2Rvir_disk=maxR2Rvir_disk,weight=weight)
         jDisc /= np.linalg.norm(jDisc)
         j_z = (j_vec_x*jDisc[0] + j_vec_y*jDisc[1] + j_vec_z*jDisc[2])
